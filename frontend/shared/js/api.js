@@ -3,7 +3,7 @@
 // 调用：FlowLawAPI.login(username, password)
 
 (function(global){
-	const BASE = 'http://localhost:5000/api'; // 可根据环境切换
+	const BASE = 'const BASE = 'https://flow-law-ai.onrender.com/api'; 
 
 	async function request(path, { method = 'GET', headers = {}, body = undefined, raw = false } = {}) {
 		const opts = { method, headers, body };
@@ -29,7 +29,7 @@
 	}
 
 	// 腾讯云 HTTP SSE 智能问答
-	const FIXED_BOT_APP_KEY = '你的固定AppKey'; // 请替换为你的真实AppKey
+	const FIXED_BOT_APP_KEY = 'PaoePzIPDpqZRDFfWrAuKIvOXYNehWVPurzAzSnQOcZLHHBcNcXUNEHLPtvtArKfxENnEUkCaojJRWMAjqsuttiHbFiGqhKPvGNjPdeYKsUqTVkOUlmxIMsmVdIPJbum'; // 请替换为你的真实AppKey
 
 	async function chat({
 		content,
@@ -113,3 +113,4 @@
 
 	global.FlowLawAPI = { request, login, uploadFile, chat, scan, auditContract, logout, productInfo, productAudit };
 })(window);
+
