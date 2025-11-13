@@ -1,0 +1,671 @@
+<html lang="zh-CN"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能合规问答机器人 - LawFlow AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="../shared/js/api.js"></script>
+    <script src="../shared/js/script.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1a73e8',
+                        secondary: '#4285f4',
+                        accent: '#7c3aed',
+                        light: '#f8f9fa',
+                        dark: '#202124'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'typing': 'typing 1.5s infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'ripple': 'ripple 2s linear infinite',
+                    },
+                    keyframes: {
+                        typing: {
+                            '0%, 100%': { opacity: 0.5 },
+                            '50%': { opacity: 1 },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        ripple: {
+                            '0%': { transform: 'scale(0.8)', opacity: 1 },
+                            '100%': { transform: 'scale(1.5)', opacity: 0 },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="./css/agent.css">
+</head>
+<body class="min-h-screen text-dark font-sans dark-mode">
+    <nav class="glass-nav fixed top-0 left-0 right-0 z-50 agent-nav">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="../index.html" id="nav-logo-home" class="flex items-center space-x-2 group" aria-label="返回首页" title="返回首页">
+                <img src="../shared/assets/icon/logo.png" alt="LawFlow AI Logo" class="h-8 w-auto transition-transform duration-300 group-hover:scale-110" loading="lazy">
+                <span class="text-xl font-bold group-hover:text-secondary transition-colors">LawFlow AI</span>
+            </a>
+            <div class="hidden md:flex items-center space-x-4 nav-links">
+                <a href="../index.html" class="nav-pill brand-home" aria-label="返回首页">LawFlow 首页</a>
+                <button id="go-home-btn" type="button" class="nav-link nav-home-action" aria-label="快速返回首页" title="返回首页">返回首页</button>
+                <a href="#features" class="nav-link" data-scroll>聊天</a>
+                <a href="#function-cards" class="nav-link" data-scroll>快捷功能</a>
+                <a href="#showcase" class="nav-link" data-scroll>产品审查</a>
+                <a href="#advanced" class="nav-link" data-scroll>行业方案</a>
+                <a href="#guide" class="nav-link" data-scroll>使用指南</a>
+                <a href="#samples" class="nav-link" data-scroll>示例提问</a>
+            </div>
+            <div class="md:hidden">
+                <button id="mobile-menu-button" class="text-light hover:text-secondary">
+                    <i class="fa fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden bg-primary bg-opacity-95 backdrop-blur-sm">
+            <div class="container mx-auto px-4 py-2 flex flex-col space-y-3">
+                <a href="../index.html" class="block py-2 hover:text-secondary transition-colors">首页</a>
+                <a href="#features" class="block py-2 hover:text-secondary transition-colors" data-scroll>聊天</a>
+                <a href="#function-cards" class="block py-2 hover:text-secondary transition-colors" data-scroll>快捷功能</a>
+                <a href="#showcase" class="block py-2 hover:text-secondary transition-colors" data-scroll>产品审查</a>
+                <a href="#advanced" class="block py-2 hover:text-secondary transition-colors" data-scroll>行业方案</a>
+                <a href="#guide" class="block py-2 hover:text-secondary transition-colors" data-scroll>使用指南</a>
+                <a href="#samples" class="block py-2 hover:text-secondary transition-colors" data-scroll>示例提问</a>
+                <a href="#" class="bg-secondary hover:bg-opacity-80 px-4 py-2 rounded-md transition-colors text-center">登录</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto px-4 pt-24 pb-16 relative">
+        <div class="absolute inset-0 -z-10 overflow-hidden" id="agentDynamicBG">
+            <div class="agent-bg-gradient"></div>
+            <canvas id="agentThreeCanvas" class="absolute inset-0 w-full h-full"></canvas>
+        </div>
+        
+        <div class="text-center mb-14 hero-wrapper relative">
+            <div class="hero-orbits pointer-events-none" aria-hidden="true">
+                <span class="orbit-dot od1"></span>
+                <span class="orbit-dot od2"></span>
+                <span class="orbit-dot od3"></span>
+                <span class="orbit-ring ring1"></span>
+                <span class="orbit-ring ring2"></span>
+            </div>
+            <img src="../shared/assets/icon/logo.png" alt="LawFlow AI Logo" class="mx-auto mb-6 hero-logo relative z-10" />
+            <h1 class="text-3xl md:text-5xl font-bold mb-5 tracking-wide hero-title gradient-text">智能合规问答机器人</h1>
+            <p id="hero-rotating-text" class="hero-rotating text-sm md:text-base max-w-2xl mx-auto opacity-90" data-texts='["AI驱动合规洞察","多地区法规智能检索","实时风险标签生成","知识产权初筛与预警"]'>AI驱动合规洞察</p>
+            <div class="scroll-indicator mt-8">
+                <a href="#features" data-scroll aria-label="向下滚动查看功能" class="si-link">
+                    <span class="si-mouse"></span>
+                    <span class="si-arrow"></span>
+                </a>
+            </div>
+        </div>
+
+        <div class="flex flex-col lg:flex-row gap-6" id="features">
+            <div class="w-full lg:w-3/4 order-2 lg:order-1">
+                <div class="bg-white rounded-xl shadow-lg h-[70vh] flex flex-col border border-gray-100 relative agent-chat-shell">
+                    <canvas id="bgParticles" class="absolute inset-0 w-full h-full pointer-events-none opacity-60"></canvas>
+                    <div class="p-4 border-b border-white border-opacity-10 flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full overflow-hidden mr-3 ring-2 ring-secondary/40 shadow-md">
+                                <img src="../shared/assets/icon/robot.jpg" alt="AI Assistant" class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <h3 class="font-bold">合规助手</h3>
+                                <div class="flex items-center text-xs text-light text-opacity-70">
+                                    <span class="w-2 h-2 rounded-full bg-green-500 mr-1"></span>
+                                    <span>在线</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <button id="clear-chat" class="text-light text-opacity-70 hover:text-secondary transition-colors">
+                                <i class="fa fa-trash-o"></i>
+                            </button>
+                            <button id="history-toggle" class="text-light text-opacity-70 hover:text-secondary transition-colors">
+                                <i class="fa fa-history"></i>
+                            </button>
+                            <button id="settings-toggle" class="text-light text-opacity-70 hover:text-secondary transition-colors">
+                                <i class="fa fa-cog"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="chat-messages" class="flex-1 p-4 overflow-y-auto scrollbar-thin space-y-4">
+                        <div class="flex items-start">
+                            <div class="w-8 h-8 rounded-full overflow-hidden mr-2 flex-shrink-0">
+                                <img src="../shared/assets/icon/robot.jpg" alt="AI Assistant" class="w-full h-full object-cover">
+                            </div>
+                            <div class="bg-white bg-opacity-10 rounded-lg p-3 max-w-[80%]">
+                                <p>您好！我是智能合规问答机器人，可以为您提供实时合规咨询和问题解答。请问有什么可以帮助您的？</p>
+                                <div class="mt-1 text-xs text-light text-opacity-50">
+                                    <span>今天 10:30</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start justify-end">
+                            <div class="bg-secondary bg-opacity-20 rounded-lg p-3 max-w-[80%]">
+                                <p>什么是数据合规？</p>
+                                <div class="mt-1 text-xs text-light text-opacity-50 text-right">
+                                    <span>今天 10:31</span>
+                                </div>
+                            </div>
+                            <div class="w-8 h-8 rounded-full bg-secondary bg-opacity-20 flex items-center justify-center ml-2 flex-shrink-0">
+                                <i class="fa fa-user text-secondary"></i>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start">
+                            <div class="w-8 h-8 rounded-full overflow-hidden mr-2 flex-shrink-0">
+                                <img src="../shared/assets/icon/robot.jpg" alt="AI Assistant" class="w-full h-full object-cover">
+                            </div>
+                            <div class="bg-white bg-opacity-10 rounded-lg p-3 max-w-[80%]">
+                                <p>数据合规是指企业或组织在收集、存储、处理、传输和使用数据的过程中，遵守相关法律法规、行业标准和内部政策的行为。</p>
+                                <p class="mt-2">数据合规的核心要求包括：</p>
+                                <ul class="list-disc pl-5 mt-1 space-y-1">
+                                    <li>数据收集的合法性和透明性</li>
+                                    <li>数据主体的知情权和控制权</li>
+                                    <li>数据安全保护措施</li>
+                                    <li>数据跨境传输的合规性</li>
+                                    <li>数据留存和销毁的合规性</li>
+                                </ul>
+                                <p class="mt-2">不同国家和地区有不同的数据保护法规，如欧盟的GDPR、中国的《个人信息保护法》等。企业需要根据自身业务范围和数据处理活动，建立相应的数据合规体系。</p>
+                                <div class="mt-1 text-xs text-light text-opacity-50">
+                                    <span>今天 10:32</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="p-4 border-t border-white border-opacity-10">
+                        <div class="flex items-center">
+                            <button id="voice-input" class="text-light text-opacity-70 hover:text-secondary transition-colors mr-3">
+                                <i class="fa fa-microphone"></i>
+                            </button>
+                            <button id="upload-file" class="text-light text-opacity-70 hover:text-secondary transition-colors mr-3">
+                                <i class="fa fa-paperclip"></i>
+                            </button>
+                            <div class="flex-1 relative">
+                                <input type="text" id="chat-input" class="w-full bg-white bg-opacity-5 border border-white border-opacity-10 rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-secondary" placeholder="输入您的问题...">
+                                <div id="suggestions" class="absolute bottom-full left-0 right-0 mb-2 bg-white bg-opacity-5 border border-white border-opacity-10 rounded-lg p-2 hidden">
+                                    <div class="suggestion-item px-3 py-1 rounded hover:bg-white hover:bg-opacity-10 cursor-pointer text-sm">如何处理数据泄露？</div>
+                                    <div class="suggestion-item px-3 py-1 rounded hover:bg-white hover:bg-opacity-10 cursor-pointer text-sm">个人信息保护法的主要要求是什么？</div>
+                                </div>
+                            </div>
+                            <button id="send-message" class="ml-3 bg-secondary hover:bg-opacity-80 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-105 hover:shadow-lg">
+                                <i class="fa fa-paper-plane"></i>
+                            </button>
+                        </div>
+                        <div class="mt-2 flex items-center justify-between text-xs text-light text-opacity-50">
+                            <div id="status-indicator">已连接到AI助手</div>
+                            <div>
+                                <span id="char-count">0</span>/500
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 快捷功能卡片组（聊天框下方） -->
+                <div class="mt-8" id="function-cards">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+                        <!-- 功能卡片1：产品链接分析 -->
+                        <div class="function-card group relative">
+                            <div class="function-card-media">
+                                <img src="../shared/assets/images/product_link.png" alt="产品链接分析" class="media-img group-hover:scale-110">
+                                <div class="media-overlay"></div>
+                            </div>
+                            <div class="function-card-body">
+                                <h3 class="function-card-title">产品链接分析</h3>
+                                <p class="function-card-desc">上传或粘贴产品页面链接，系统自动抓取标题、描述、图像与销售声明，生成初步合规标签（安全/环保/知识产权风险）。适合跨境电商初筛。</p>
+                                <div class="space-y-2 mt-2">
+                                    <div class="function-card-action prompt-template" data-prompt="帮我审查这个产品的合规性：[请输入产品链接]">
+                                        <span>点击使用：审查产品合规性</span>
+                                    </div>
+                                    <div class="function-card-copy" data-copy="请基于该产品链接抓取核心信息（标题/主图/主要功能/材质/适用人群），并初步归纳潜在合规风险分类（安全认证、环保材料、知识产权、目标市场准入）。链接：">复制推荐 Prompt</div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 功能卡片2：法规合规查询 -->
+                        <div class="function-card group relative">
+                            <div class="function-card-media">
+                                <img src="../shared/assets/images/law_search.png" alt="法规合规查询" class="media-img group-hover:scale-110">
+                                <div class="media-overlay"></div>
+                            </div>
+                            <div class="function-card-body">
+                                <h3 class="function-card-title">法规合规查询</h3>
+                                <p class="function-card-desc">按地区与产品/业务类型检索核心强制性法规及常见行业标准，输出监管机构、必要认证与高风险条款。支持多地区对比。</p>
+                                <div class="space-y-2 mt-2">
+                                    <div class="function-card-action prompt-template" data-prompt="查询[地区]关于[产品类型]的合规要求">
+                                        <span>点击使用：查询地区法规</span>
+                                    </div>
+                                    <div class="function-card-copy" data-copy="请列出在[目标市场]销售[产品类型]需要关注的核心法规及对应主管部门，并区分强制认证、推荐标准与潜在禁止条款。市场：">复制推荐 Prompt</div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 功能卡片3：知识产权审查 -->
+                        <div class="function-card group relative">
+                            <div class="function-card-media">
+                                <img src="../shared/assets/images/report_md.png" alt="知识产权审查" class="media-img group-hover:scale-110">
+                                <div class="media-overlay"></div>
+                            </div>
+                            <div class="function-card-body">
+                                <h3 class="function-card-title">知识产权审查</h3>
+                                <p class="function-card-desc">辅助识别商标、外观、功能设计潜在侵权点，提示需比对的专利分类与是否建议进行商标替换或规避设计调整。</p>
+                                <div class="space-y-2 mt-2">
+                                    <div class="function-card-action prompt-template" data-prompt="分析该产品的商标和设计是否存在侵权风险">
+                                        <span>点击使用：知识产权检查</span>
+                                    </div>
+                                    <div class="function-card-copy" data-copy="请根据该产品的名称与核心设计元素，列出可能存在的商标或外观专利风险，并建议降低侵权风险的修改方向。产品名称：">复制推荐 Prompt</div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 功能卡片4：市场推荐 -->
+                        <div class="function-card group relative">
+                            <div class="function-card-media">
+                                <img src="../shared/assets/images/statis.png" alt="市场推荐" class="media-img group-hover:scale-110">
+                                <div class="media-overlay"></div>
+                            </div>
+                            <div class="function-card-body">
+                                <h3 class="function-card-title">市场推荐</h3>
+                                <p class="function-card-desc">结合产品合规成熟度、认证成本、目标地区法规壁垒与竞争风险，输出优先进入市场梯度与落地准备清单。</p>
+                                <div class="space-y-2 mt-2">
+                                    <div class="function-card-action prompt-template" data-prompt="根据合规分析，推荐适合该产品的销售地区">
+                                        <span>点击使用：推荐销售地区</span>
+                                    </div>
+                                    <div class="function-card-copy" data-copy="请基于产品当前合规状态（功能/材质/认证进度），按优先级列出可进入的海外市场并给出每个市场的首要合规准备事项。产品概述：">复制推荐 Prompt</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full lg:w-1/4 space-y-6 order-1 lg:order-2">
+                <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-100 sidebar-panel">
+                    <h2 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fa fa-star text-secondary mr-2"></i>核心特性
+                    </h2>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                            <span>7×24小时在线咨询服务</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                            <span>多行业合规标准支持</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                            <span>智能语义理解与匹配</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                            <span>实时法规更新推送</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                            <span>多语言支持</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-100 sidebar-panel">
+                    <h2 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fa fa-question-circle text-secondary mr-2"></i>常用问题
+                    </h2>
+                    <div id="common-questions" class="space-y-3">
+                        <div class="question-item p-3 rounded-lg bg-white bg-opacity-5 hover:bg-opacity-10 cursor-pointer transition-colors">
+                            <span class="text-xs px-2 py-1 rounded-full bg-secondary bg-opacity-20 text-secondary">基础概念</span>
+                            <p class="mt-1">什么是数据合规？</p>
+                        </div>
+                        <div class="question-item p-3 rounded-lg bg-white bg-opacity-5 hover:bg-opacity-10 cursor-pointer transition-colors">
+                            <span class="text-xs px-2 py-1 rounded-full bg-secondary bg-opacity-20 text-secondary">数据传输</span>
+                            <p class="mt-1">如何处理跨境数据传输？</p>
+                        </div>
+                        <div class="question-item p-3 rounded-lg bg-white bg-opacity-5 hover:bg-opacity-10 cursor-pointer transition-colors">
+                            <span class="text-xs px-2 py-1 rounded-full bg-secondary bg-opacity-20 text-secondary">国际法规</span>
+                            <p class="mt-1">GDPR对企业有哪些要求？</p>
+                        </div>
+                        <div class="question-item p-3 rounded-lg bg-white bg-opacity-5 hover:bg-opacity-10 cursor-pointer transition-colors">
+                            <span class="text-xs px-2 py-1 rounded-full bg-secondary bg-opacity-20 text-secondary">行业标准</span>
+                            <p class="mt-1">金融行业数据安全标准是什么？</p>
+                        </div>
+                        <div class="question-item p-3 rounded-lg bg-white bg-opacity-5 hover:bg-opacity-10 cursor-pointer transition-colors">
+                            <span class="text-xs px-2 py-1 rounded-full bg-secondary bg-opacity-20 text-secondary">合规流程</span>
+                            <p class="mt-1">如何建立企业合规体系？</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-100 sidebar-panel">
+                    <h2 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fa fa-file-text text-secondary mr-2"></i>相关资源
+                    </h2>
+                    <div id="document-resources" class="space-y-3">
+                        <div class="document-item p-3 rounded-lg bg-white bg-opacity-5 hover:bg-opacity-10 cursor-pointer transition-colors flex items-center">
+                            <i class="fa fa-file-pdf-o text-secondary mr-3 text-xl"></i>
+                            <a href="#" class="hover:text-secondary transition-colors">数据安全合规指南</a>
+                        </div>
+                        <div class="document-item p-3 rounded-lg bg-white bg-opacity-5 hover:bg-opacity-10 cursor-pointer transition-colors flex items-center">
+                            <i class="fa fa-file-pdf-o text-secondary mr-3 text-xl"></i>
+                            <a href="#" class="hover:text-secondary transition-colors">跨境业务合规 checklist</a>
+                        </div>
+                        <div class="document-item p-3 rounded-lg bg-white bg-opacity-5 hover:bg-opacity-10 cursor-pointer transition-colors flex items-center">
+                            <i class="fa fa-file-pdf-o text-secondary mr-3 text-xl"></i>
+                            <a href="#" class="hover:text-secondary transition-colors">GDPR合规实施指南</a>
+                        </div>
+                        <div class="document-item p-3 rounded-lg bg-white bg-opacity-5 hover:bg-opacity-10 cursor-pointer transition-colors flex items-center">
+                            <i class="fa fa-file-pdf-o text-secondary mr-3 text-xl"></i>
+                            <a href="#" class="hover:text-secondary transition-colors">企业数据分类分级标准</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-12 bg-white bg-opacity-5 backdrop-blur-sm rounded-xl shadow-lg p-6 border border-white border-opacity-10" id="guide">
+            <h2 class="text-2xl font-bold mb-4">使用指南</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="p-4 rounded-lg bg-white bg-opacity-5">
+                    <div class="w-12 h-12 rounded-full bg-secondary bg-opacity-20 flex items-center justify-center mb-3">
+                        <i class="fa fa-comments text-secondary text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">提问方式</h3>
+                    <p class="text-light text-opacity-80">您可以直接输入您的合规问题，系统会智能分析并提供专业解答。例如："什么是GDPR？"或"如何处理用户数据删除请求？"</p>
+                </div>
+                <div class="p-4 rounded-lg bg-white bg-opacity-5">
+                    <div class="w-12 h-12 rounded-full bg-secondary bg-opacity-20 flex items-center justify-center mb-3">
+                        <i class="fa fa-file-text-o text-secondary text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">文档上传</h3>
+                    <p class="text-light text-o pacity-80">您可以上传相关文档，系统将分析文档内容并提供针对性的合规建议。支持PDF、Word等常见文档格式。</p>
+                </div>
+                <div class="p-4 rounded-lg bg-white bg-opacity-5">
+                    <div class="w-12 h-12 rounded-full bg-secondary bg-opacity-20 flex items-center justify-center mb-3">
+                        <i class="fa fa-history text-secondary text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">历史记录</h3>
+                    <p class="text-light text-opacity-80">系统会保存您的对话历史，您可以随时查看和继续之前的对话。您也可以清除历史记录以保护隐私。</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-12 bg-white bg-opacity-5 backdrop-blur-sm rounded-xl shadow-lg p-6 border border-white border-opacity-10" id="showcase">
+            <h2 class="text-2xl font-bold mb-4">产品合规审查</h2>
+            <p class="text-light text-opacity-80 mb-4 text-sm leading-relaxed">输入产品链接后，系统将抓取标题/图片/描述生成结构化审查报告。</p>
+            <div class="flex flex-col md:flex-row gap-4 mb-4">
+                <input id="productUrlInput" type="text" placeholder="例如：https://example.com/product" class="flex-1 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-secondary" />
+                <button id="fetchProductBtn" class="bg-secondary hover:bg-opacity-90 transition-colors px-4 py-2 rounded-lg text-sm">抓取信息</button>
+                <button id="auditProductBtn" class="bg-primary hover:bg-opacity-90 transition-colors px-4 py-2 rounded-lg text-sm">生成报告</button>
+            </div>
+            <div id="product-info-panel" class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4 hidden">
+                <div class="col-span-1">
+                    <div class="rounded-lg overflow-hidden shadow border border-white border-opacity-10 bg-white bg-opacity-10 aspect-video" id="productImageWrapper">
+                        <img id="productImage" src="" alt="产品图" class="w-full h-full object-cover"/>
+                    </div>
+                </div>
+                <div class="col-span-2 space-y-3">
+                    <h3 id="productTitle" class="text-xl font-semibold"></h3>
+                    <p id="productDesc" class="text-sm text-light text-opacity-80 leading-relaxed"></p>
+                    <div class="text-xs text-light text-opacity-50" id="productMeta"></div>
+                </div>
+            </div>
+            <div id="product-audit-result" class="mt-6 hidden">
+                <h3 class="text-xl font-semibold mb-2">合规审查结果</h3>
+                <div class="rounded-lg p-4 bg-white bg-opacity-10 border border-white border-opacity-10 space-y-3 text-sm" id="auditRawText"></div>
+                <details class="mt-3 bg-white bg-opacity-5 rounded-lg p-3 border border-white border-opacity-10">
+                    <summary class="cursor-pointer font-medium">展开 Markdown 报告</summary>
+                    <pre id="auditMd" class="mt-2 text-xs whitespace-pre-wrap"></pre>
+                </details>
+                <div id="auditMarkets" class="mt-3 text-xs text-light text-opacity-70"></div>
+            </div>
+        </div>
+
+        <div class="mt-12">
+            <h2 class="text-2xl font-bold mb-6 text-center">行业合规解决方案</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+                <div class="bg-white bg-opacity-5 backdrop-blur-sm rounded-xl shadow-lg p-6 border border-white border-opacity-10 hover:shadow-xl transition-shadow">
+                    <div class="w-12 h-12 rounded-full bg-secondary bg-opacity-20 flex items-center justify-center mb-4">
+                        <i class="fa fa-shopping-cart text-secondary text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">跨境电商场景</h3>
+                    <p class="text-light text-opacity-80 mb-4">为跨境电商提供产品合规审查、关税计算和目标市场准入分析。</p>
+                    <a href="#" class="text-secondary hover:underline flex items-center">
+                        <span>了解更多</span>
+                        <i class="fa fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+                <div class="bg-white bg-opacity-5 backdrop-blur-sm rounded-xl shadow-lg p-6 border border-white border-opacity-10 hover:shadow-xl transition-shadow">
+                    <div class="w-12 h-12 rounded-full bg-secondary bg-opacity-20 flex items-center justify-center mb-4">
+                        <i class="fa fa-globe text-secondary text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">数据跨境场景</h3>
+                    <p class="text-light text-opacity-80 mb-4">提供数据跨境传输合规方案，包括数据分类、安全评估和传输路径规划。</p>
+                    <a href="#" class="text-secondary hover:underline flex items-center">
+                        <span>了解更多</span>
+                        <i class="fa fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+                <div class="bg-white bg-opacity-5 backdrop-blur-sm rounded-xl shadow-lg p-6 border border-white border-opacity-10 hover:shadow-xl transition-shadow">
+                    <div class="w-12 h-12 rounded-full bg-secondary bg-opacity-20 flex items-center justify-center mb-4">
+                        <i class="fa fa-industry text-secondary text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">制造业出海场景</h3>
+                    <p class="text-light text-opacity-80 mb-4">为制造企业提供产品认证、环保标准和目标市场行业法规合规支持。</p>
+                    <a href="#" class="text-secondary hover:underline flex items-center">
+                        <span>了解更多</span>
+                        <i class="fa fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+                <div class="bg-white bg-opacity-5 backdrop-blur-sm rounded-xl shadow-lg p-6 border border-white border-opacity-10 hover:shadow-xl transition-shadow">
+                    <div class="w-12 h-12 rounded-full bg-secondary bg-opacity-20 flex items-center justify-center mb-4">
+                        <i class="fa fa-users text-secondary text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">跨国劳务合作场景</h3>
+                    <p class="text-light text-opacity-80 mb-4">为跨国劳务合作提供合规咨询，包括劳动法合规、人员流动管理和跨境用工风险评估。</p>
+                    <a href="#" class="text-secondary hover:underline flex items-center">
+                        <span>了解更多</span>
+                        <i class="fa fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+                <div class="bg-white bg-opacity-5 backdrop-blur-sm rounded-xl shadow-lg p-6 border border-white border-opacity-10 hover:shadow-xl transition-shadow">
+                    <div class="w-12 h-12 rounded-full bg-secondary bg-opacity-20 flex items-center justify-center mb-4">
+                        <i class="fa fa-handshake-o text-secondary text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">跨国投资合作场景</h3>
+                    <p class="text-light text-opacity-80 mb-4">为跨国投资合作提供法律合规支持，包括投资结构设计、监管审批和风险防控。</p>
+                    <a href="#" class="text-secondary hover:underline flex items-center">
+                        <span>了解更多</span>
+                        <i class="fa fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <section class="mt-12 grid grid-cols-1 lg:grid-cols-3 gap-6" id="advanced">
+            <div class="rounded-xl p-6 bg-white bg-opacity-10 border border-white border-opacity-20 backdrop-blur-md shadow-lg">
+                <h3 class="text-xl font-semibold mb-2">⚙️ 动态多轮上下文保持</h3>
+                <p class="text-sm text-light text-opacity-80 leading-relaxed mb-3">系统为每轮对话维护语义缓存，后续问题自动补充缺失实体并进行一致性校验。</p>
+                <ul class="text-sm space-y-1 list-disc pl-5 text-light text-opacity-80">
+                    <li>实体指代消解 (人名/公司/地区)</li>
+                    <li>时序推断与法规生效窗口判断</li>
+                    <li>跨行业风险标签融合</li>
+                </ul>
+            </div>
+            <div class="rounded-xl p-6 bg-white bg-opacity-10 border border-white border-opacity-20 backdrop-blur-md shadow-lg">
+                <h3 class="text-xl font-semibold mb-2">🧠 智能提示工程策略</h3>
+                <p class="text-sm text-light text-opacity-80 leading-relaxed mb-3">后端使用分层提示：系统规范 → 角色设定 → 用户意图 → 历史对话摘要，保证回答稳定性。</p>
+                <div class="bg-white bg-opacity-10 rounded-md p-3 text-xs font-mono overflow-auto max-h-40">
+<pre>{"strategy":{
+  "system":"合规法律专家模型",
+  "role":"涉外法务顾问",
+  "chains":["法规检索","风险分级","建议生成"]
+}}</pre>
+                </div>
+            </div>
+            <div class="rounded-xl p-6 bg-white bg-opacity-10 border border-white border-opacity-20 backdrop-blur-md shadow-lg">
+                <h3 class="text-xl font-semibold mb-2">📊 性能与质量指标</h3>
+                <div class="grid grid-cols-2 gap-3 text-sm">
+                    <div class="p-3 rounded bg-white bg-opacity-10 flex flex-col"><span class="text-xs text-light text-opacity-60">平均响应</span><strong class="text-lg">1.8s</strong></div>
+                    <div class="p-3 rounded bg-white bg-opacity-10 flex flex-col"><span class="text-xs text-light text-opacity-60">多轮保持率</span><strong class="text-lg">92%</strong></div>
+                    <div class="p-3 rounded bg-white bg-opacity-10 flex flex-col"><span class="text-xs text-light text-opacity-60">推荐准确率</span><strong class="text-lg">87%</strong></div>
+                    <div class="p-3 rounded bg-white bg-opacity-10 flex flex-col"><span class="text-xs text-light text-opacity-60">风险召回</span><strong class="text-lg">94%</strong></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mt-12 bg-white bg-opacity-10 backdrop-blur-sm rounded-xl shadow-lg p-6 border border-white border-opacity-10" id="samples">
+            <h2 class="text-2xl font-bold mb-4">示例提问</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+                <div class="p-4 rounded bg-white bg-opacity-5 hover:bg-opacity-10 transition cursor-pointer sample-q" data-q="GDPR下如何合法采集用户邮件地址？">GDPR下如何合法采集用户邮件地址？</div>
+                <div class="p-4 rounded bg-white bg-opacity-5 hover:bg-opacity-10 transition cursor-pointer sample-q" data-q="美国与欧盟跨境数据传输的差异是什么？">美国与欧盟跨境数据传输的差异是什么？</div>
+                <div class="p-4 rounded bg-white bg-opacity-5 hover:bg-opacity-10 transition cursor-pointer sample-q" data-q="供应商合同中的责任限制条款应如何设计？">供应商合同中的责任限制条款应如何设计？</div>
+                <div class="p-4 rounded bg-white bg-opacity-5 hover:bg-opacity-10 transition cursor-pointer sample-q" data-q="医疗行业隐私数据需要额外哪些加密措施？">医疗行业隐私数据需要额外哪些加密措施？</div>
+                <div class="p-4 rounded bg-white bg-opacity-5 hover:bg-opacity-10 transition cursor-pointer sample-q" data-q="如何建立数据生命周期管理策略？">如何建立数据生命周期管理策略？</div>
+                <div class="p-4 rounded bg-white bg-opacity-5 hover:bg-opacity-10 transition cursor-pointer sample-q" data-q="个人信息保护法与GDPR的用户权利差异？">个人信息保护法与GDPR的用户权利差异？</div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer py-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <div class="flex items-center space-x-2">
+                        <img src="../shared/assets/icon/logo.png" alt="LawFlow AI Logo" class="h-8 w-auto" loading="lazy">
+                        <span class="text-xl font-bold">LawFlow AI</span>
+                    </div>
+                    <p class="text-light text-opacity-60 mt-2">AI驱动的涉外法务合规智能平台</p>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-light text-opacity-60 hover:text-secondary transition-colors">
+                        <i class="fa fa-weixin text-xl"></i>
+                    </a>
+                    <a href="#" class="text-light text-opacity-60 hover:text-secondary transition-colors">
+                        <i class="fa fa-weibo text-xl"></i>
+                    </a>
+                    <a href="#" class="text-light text-opacity-60 hover:text-secondary transition-colors">
+                        <i class="fa fa-linkedin text-xl"></i>
+                    </a>
+                    <a href="#" class="text-light text-opacity-60 hover:text-secondary transition-colors">
+                        <i class="fa fa-envelope text-xl"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="mt-8 pt-6 border-t border-white border-opacity-10 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-light text-opacity-60 text-sm">© 2025 LawFlow AI. 保留所有权利。</p>
+                <div class="mt-4 md:mt-0 flex space-x-6">
+                    <a href="#" class="text-light text-opacity-60 hover:text-secondary transition-colors text-sm">隐私政策</a>
+                    <a href="#" class="text-light text-opacity-60 hover:text-secondary transition-colors text-sm">服务条款</a>
+                    <a href="#" class="text-light text-opacity-60 hover:text-secondary transition-colors text-sm">联系我们</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div id="history-modal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="bg-primary bg-opacity-95 backdrop-blur-sm rounded-xl shadow-xl w-full max-w-2xl max-h-[80vh] overflow-hidden">
+            <div class="p-4 border-b border-white border-opacity-10 flex items-center justify-between">
+                <h3 class="text-xl font-bold">历史对话</h3>
+                <button id="close-history" class="text-light text-opacity-70 hover:text-secondary transition-colors">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="p-4 overflow-y-auto scrollbar-thin">
+                <div class="space-y-3">
+                    <div class="history-item p-3 rounded-lg bg-white bg-opacity-5 hover:bg-opacity-10 cursor-pointer transition-colors">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-medium">数据合规基础咨询</h4>
+                            <span class="text-xs text-light text-opacity-50">今天 10:30</span>
+                        </div>
+                        <p class="text-sm text-light text-opacity-70 mt-1">关于数据合规的基本概念和要求</p>
+                    </div>
+                    <div class="history-item p-3 rounded-lg bg-white bg-opacity-5 hover:bg-opacity-10 cursor-pointer transition-colors">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-medium">GDPR合规要求</h4>
+                            <span class="text-xs text-light text-opacity-50">昨天 15:45</span>
+                        </div>
+                        <p class="text-sm text-light text-opacity-70 mt-1">了解GDPR对企业的具体要求和应对措施</p>
+                    </div>
+                    <div class="history-item p-3 rounded-lg bg-white bg-opacity-5 hover:bg-opacity-10 cursor-pointer transition-colors">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-medium">跨境数据传输方案</h4>
+                            <span class="text-xs text-light text-opacity-50">2023/11/28</span>
+                        </div>
+                        <p class="text-sm text-light text-opacity-70 mt-1">设计符合多国法规的数据跨境传输流程</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="bg-primary bg-opacity-95 backdrop-blur-sm rounded-xl shadow-xl w-full max-w-md p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold">设置</h3>
+                <button id="close-settings" class="text-light text-opacity-70 hover:text-secondary transition-colors">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="space-y-6">
+                <div>
+                    <label class="block mb-2">语言设置</label>
+                    <select class="w-full bg-white bg-opacity-5 border border-white border-opacity-10 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-secondary">
+                        <option>中文</option>
+                        <option>English</option>
+                        <option>日本語</option>
+                        <option>한국어</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block mb-2">回答风格</label>
+                    <select class="w-full bg-white bg-opacity-5 border border-white border-opacity-10 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-secondary">
+                        <option>专业模式</option>
+                        <option>简洁模式</option>
+                        <option>详细模式</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block mb-2">行业选择</label>
+                    <select class="w-full bg-white bg-opacity-5 border border-white border-opacity-10 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-secondary">
+                        <option>通用</option>
+                        <option>金融</option>
+                        <option>医疗</option>
+                        <option>电商</option>
+                        <option>制造业</option>
+                    </select>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span>保存历史记录</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" class="sr-only peer" checked="">
+                        <div class="w-11 h-6 bg-white bg-opacity-10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+                    </label>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span>深色模式</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" class="sr-only peer" checked="">
+                        <div class="w-11 h-6 bg-white bg-opacity-10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+                    </label>
+                </div>
+                <button class="w-full bg-secondary hover:bg-opacity-80 py-2 px-4 rounded-lg transition-colors">
+                    保存设置
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="./js/agent.js"></script>
+</body>
+</html>

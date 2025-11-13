@@ -1,0 +1,58 @@
+[
+  {
+    "title": "欧盟人工智能法案进入执行筹备阶段",
+    "region": "europe",
+    "category": "科技",
+    "summary": "欧盟委员会发布AI法案执法准备文件，成员国监管机构协调机制初步成型。",
+    "effective_date": "2025-09-01"
+  },
+  {
+    "title": "中国出台跨境数据分类分级指导意见",
+    "region": "asia",
+    "category": "数据安全",
+    "summary": "意见明确敏感与核心数据出境审查要点，提出备案与年度评估机制。",
+    "effective_date": "2025-07-15"
+  },
+  {
+    "title": "美国SEC细化数字资产托管合规要求",
+    "region": "namerica",
+    "category": "金融",
+    "summary": "托管机构需增强资产隔离与风险披露，过渡期 12 个月。",
+    "effective_date": "2025-08-20"
+  },
+  {
+    "title": "英国更新金融服务与市场法案次级法规",
+    "region": "europe",
+    "category": "金融",
+    "summary": "聚焦金融科技沙盒与稳定币支付试点指引。",
+    "effective_date": "2025-06-30"
+  },
+  {
+    "title": "日本推进生成式AI合规自律指引",
+    "region": "asia",
+    "category": "科技",
+    "summary": "行业协会联合发布训练数据来源透明度最低标准。",
+    "effective_date": "2025-05-25"
+  },
+  {
+    "title": "新加坡个人数据保护法附录修订征求意见稿",
+    "region": "asia",
+    "category": "数据安全",
+    "summary": "拟扩大强制通知场景，强化数据传输责任链条。",
+    "effective_date": "2025-10-01"
+  },
+  {
+    "title": "德国能源转型激励政策合规披露细则发布",
+    "region": "europe",
+    "category": "能源",
+    "summary": "新增对绿色氢项目资金使用与碳减排测算的审计要求。",
+    "effective_date": "2025-07-10"
+  },
+  {
+    "title": "巴西开放银行隐私与数据共享补充规范",
+    "region": "samerica",
+    "category": "金融",
+    "summary": "明确开放接口调用日志留存与异常访问告警阈值。",
+    "effective_date": "2025-09-05"
+  }
+]

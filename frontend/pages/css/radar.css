@@ -1,0 +1,135 @@
+/* 页面整体背景与动态光层 */
+.radar-body { background:linear-gradient(135deg,#081730 0%, #10365f 42%, #1e4d81 85%); color:#e2e8f0; min-height:100vh; position:relative; overflow-x:hidden; }
+/* 玻璃导航与标题对比增强 */
+.glass-nav { backdrop-filter: blur(14px) saturate(160%); background: rgba(15,30,61,0.55); border-bottom:1px solid rgba(255,255,255,0.12); box-shadow:0 8px 24px -6px rgba(0,0,0,0.35); }
+.glass-nav a, .glass-nav span, .glass-nav .text-primary { color:#f1f5f9 !important; }
+.glass-nav a:hover { color:#93c5fd !important; }
+.radar-body:before, .radar-body:after { content:""; position:fixed; inset:0; pointer-events:none; }
+.radar-body:before { background:radial-gradient(circle at 25% 30%, rgba(255,255,255,.15) 0%, rgba(255,255,255,0) 55%), radial-gradient(circle at 75% 70%, rgba(255,255,255,.12) 0%, rgba(255,255,255,0) 60%); mix-blend-mode:screen; animation: radarGlow 18s ease-in-out infinite; }
+.radar-body:after { background:repeating-linear-gradient(45deg, rgba(255,255,255,.06) 0 2px, transparent 2px 6px); opacity:.35; }
+@keyframes radarGlow { 0% { filter:hue-rotate(0deg);} 50% { filter:hue-rotate(25deg) brightness(1.05);} 100% { filter:hue-rotate(-15deg);} }
+/* 漂浮柔性彩色 Blobs */
+.radar-blob { position:absolute; width:220px; height:220px; background:radial-gradient(circle at 30% 30%, rgba(99,102,241,.6), rgba(99,102,241,0)); border-radius:45% 55% 60% 40%; filter:blur(12px); animation: blobFloat 22s linear infinite; mix-blend-mode:overlay; }
+.radar-blob:nth-child(2){ left:65%; top:15%; animation-delay:6s; background:radial-gradient(circle at 30% 30%, rgba(56,189,248,.55), rgba(56,189,248,0)); }
+.radar-blob:nth-child(3){ left:10%; top:60%; animation-delay:12s; background:radial-gradient(circle at 30% 30%, rgba(167,139,250,.55), rgba(167,139,250,0)); }
+@keyframes blobFloat { 0% { transform:translateY(0) rotate(0deg); } 50% { transform:translateY(-60px) rotate(180deg); } 100% { transform:translateY(0) rotate(360deg); } }
+/* 地图容器玻璃态 */
+#hotspot-map { backdrop-filter: blur(6px) saturate(140%); background:rgba(255,255,255,0.12); }
+/* 雷达扫描层与粒子点 */
+#radar-scan { position:absolute; inset:0; background:conic-gradient(from 0deg at 50% 50%, rgba(99,102,241,0.0) 0deg, rgba(99,102,241,0.25) 25deg, rgba(99,102,241,0.0) 60deg); mix-blend-mode:screen; animation: radarSweep 9s linear infinite; opacity:.65; pointer-events:none; }
+@keyframes radarSweep { 0% { transform:rotate(0deg);} 100% { transform:rotate(360deg);} }
+#radarParticles { filter:brightness(1.15) contrast(1.05); }
+/* 合规弹窗新增区块样式 */
+#compliance-panel h4 { font-size:0.95rem; }
+#panel-overview { max-height:110px; overflow-y:auto; }
+#panel-actions li { position:relative; }
+#panel-actions li::marker { color:#2C5AA0; }
+#compliance-panel { box-shadow:0 12px 32px -8px rgba(0,0,0,.35); transition:transform .25s ease, opacity .25s ease; }
+/* 面板出现时增加背景遮罩可选 (可后续动态添加) */
+.panel-mask { position:absolute; inset:0; background:rgba(0,12,32,.55); backdrop-filter:blur(4px); animation:maskFade .25s ease; }
+@keyframes maskFade { 0% { opacity:0;} 100% { opacity:1;} }
+/* 热点聚焦状态 */
+.hotspot-pin:focus { outline:2px solid #fff; outline-offset:4px; box-shadow:0 0 0 4px rgba(255,255,255,0.55),0 0 16px 4px rgba(56,189,248,.85); }
+/* 额外高光动画提升质感 */
+.hotspot-pin.high { position:relative; }
+.hotspot-pin.high::before { content:""; position:absolute; inset:-6px; border-radius:50%; background:radial-gradient(circle, rgba(255,255,255,.5), rgba(255,255,255,0)); animation:highGlow 3.2s ease-in-out infinite; }
+@keyframes highGlow { 0%,100% { transform:scale(0.6); opacity:.9;} 50% { transform:scale(1.25); opacity:0; } }
+/* 筛选列吸附 */
+.radar-filter-col { position:sticky; top:90px; align-self:flex-start; max-height:calc(100vh - 110px); overflow-y:auto; scrollbar-width:thin; }
+.radar-filter-col::-webkit-scrollbar { width:6px; }
+.radar-filter-col::-webkit-scrollbar-track { background:rgba(255,255,255,0.08); }
+.radar-filter-col::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.35); border-radius:3px; }
+/* 快速统计数字可读性 */
+#quickStats strong { font-variant-numeric: tabular-nums; }
+
+/* 数字瀑布动画 */
+#regCascade { display:flex; font-family:monospace; }
+#regCascade .col { flex:1; display:flex; flex-direction:column; justify-content:flex-start; position:relative; overflow:hidden; }
+#regCascade .digits { position:absolute; top:0; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; animation: cascade 6s linear infinite; font-size:18px; line-height:20px; letter-spacing:1px; opacity:.85; }
+#regCascade .digits.delay-1 { animation-delay: -1.2s; }
+#regCascade .digits.delay-2 { animation-delay: -2.4s; }
+#regCascade .digits.delay-3 { animation-delay: -3.6s; }
+#regCascade .digits.delay-4 { animation-delay: -4.8s; }
+@keyframes cascade { 0% { transform:translate(-50%, -100%);} 100% { transform:translate(-50%, 100%);} }
+
+/* 热点标记样式 + 动画脉冲 */
+.hotspot-pin { position:absolute; width:18px; height:18px; border-radius:50%; background:rgba(255,255,255,0.85); box-shadow:0 0 0 3px rgba(255,255,255,0.25),0 0 12px -2px rgba(99,102,241,0.65); transform:translate(-50%, -50%); cursor:pointer; pointer-events:auto; }
+.hotspot-pin::after { content:""; position:absolute; inset:0; border-radius:50%; animation: pinPulse 2.6s ease-out infinite; }
+.hotspot-pin.high { background:linear-gradient(135deg,#ef4444,#b91c1c); }
+.hotspot-pin.warning { background:linear-gradient(135deg,#f59e0b,#b45309); }
+.hotspot-pin.success { background:linear-gradient(135deg,#10b981,#047857); }
+.hotspot-pin.danger { background:linear-gradient(135deg,#dc2626,#991b1b); }
+@keyframes pinPulse { 0% { transform:scale(.6); opacity:.9;} 70% { transform:scale(2.2); opacity:0;} 100% { opacity:0; } }
+
+/* Hover 显示轮廓 */
+.hotspot-pin:hover { box-shadow:0 0 0 4px rgba(255,255,255,0.45),0 0 16px 2px rgba(99,102,241,0.85); }
+
+/* 深色模式再加对比优化 */
+.dark-mode #regCascade { background:rgba(30,41,59,0.6); }
+.dark-mode .radar-filter-col { background:rgba(30,41,59,0.75); }
+.dark-mode #quickStats div { background:rgba(255,255,255,0.06); }
+/* 基础按钮样式 */
+
+/* 深色模式覆盖 */
+.dark-mode .radar-body, .radar-body.dark-mode { background:linear-gradient(135deg,#0b1224 0%, #15253f 50%, #1f3552 100%); }
+.dark-mode nav { background:rgba(255,255,255,0.04); backdrop-filter:blur(8px); }
+.dark-mode #hotspot-map { background:rgba(255,255,255,0.05); }
+.dark-mode .badge-danger { background:#7f1d1d; color:#fecaca; }
+.dark-mode .badge-warning { background:#78350f; color:#fde68a; }
+.dark-mode .badge-success { background:#064e3b; color:#6ee7b7; }
+.dark-mode .btn-primary { background:#1d4ed8; }
+.dark-mode .btn-primary:hover { background:#1e40af; }
+.dark-mode .btn-outline { border-color:#60a5fa; color:#60a5fa; }
+.dark-mode .btn-outline:hover { background:#60a5fa; color:#0b1224; }
+.dark-mode table thead { background:#1e293b; }
+.dark-mode tbody tr:nth-child(even) { background:#1e293b; }
+
+/* ECharts 自定义 tooltip 更明显 */
+.echarts-tooltip { backdrop-filter:blur(6px); background:rgba(15,30,61,0.85); color:#fff; padding:8px 10px; border-radius:6px; font-size:12px; box-shadow:0 4px 16px -6px rgba(0,0,0,0.4); }
+.btn-primary { background:#2C5AA0; color:#fff; padding:0.5rem 1rem; font-size:0.875rem; border-radius:0.5rem; font-weight:500; display:inline-flex; align-items:center; justify-content:center; transition:.2s; }
+.btn-primary:hover { background:#1D3B67; }
+.btn-outline { background:#fff; color:#2C5AA0; padding:0.5rem 1rem; font-size:0.875rem; border:1px solid #2C5AA0; border-radius:0.5rem; font-weight:500; display:inline-flex; align-items:center; justify-content:center; transition:.2s; }
+.btn-outline:hover { background:#2C5AA0; color:#fff; }
+
+/* 徽章 */
+.badge { display:inline-block; padding:2px 8px; font-size:0.625rem; font-weight:600; border-radius:999px; line-height:1.1; letter-spacing:.5px; }
+.badge-danger { background:#FEE2E2; color:#B91C1C; }
+.badge-warning { background:#FEF3C7; color:#B45309; }
+.badge-success { background:#D1FAE5; color:#047857; }
+
+/* 卡片悬浮 */
+.card-hover { transition:.25s; }
+.card-hover:hover { box-shadow:0 8px 24px rgba(0,0,0,.08); transform:translateY(-2px); }
+
+/* 热点脉冲效果 */
+#hotspot-map [data-country] { position:relative; }
+#hotspot-map [data-country]::after { content:""; position:absolute; inset:0; border-radius:999px; animation:pulse 1.8s ease-out infinite; background:rgba(239,68,68,.35); }
+#hotspot-map [data-country].text-warning::after { background:rgba(245,158,11,.35); }
+#hotspot-map [data-country].text-success::after { background:rgba(16,185,129,.35); }
+@keyframes pulse { 0% { transform:scale(.7); opacity:.85;} 70% { transform:scale(1.8); opacity:0;} 100% { opacity:0; } }
+
+/* 弹窗动画（改为贴靠热点，不再居中位移） */
+@keyframes panelFade { 0% { opacity:0; transform:scale(.92);} 100% { opacity:1; transform:scale(1);} }
+#compliance-panel.appear { animation:panelFade .25s ease; }
+/* 箭头指示热点位置 */
+.panel-arrow { position:absolute; width:16px; height:16px; background:#ffffff; border:1px solid #d1d5db; transform:rotate(45deg); box-shadow:0 4px 12px -4px rgba(0,0,0,.25); pointer-events:none; --arrow-x: calc(50% - 8px); --arrow-y: calc(50% - 8px); }
+#compliance-panel[data-arrow="top"] .panel-arrow { top:-8px; left:var(--arrow-x); }
+#compliance-panel[data-arrow="right"] .panel-arrow { right:-8px; top:var(--arrow-y); }
+#compliance-panel[data-arrow="bottom"] .panel-arrow { bottom:-8px; left:var(--arrow-x); }
+#compliance-panel[data-arrow="left"] .panel-arrow { left:-8px; top:var(--arrow-y); }
+.dark-mode .panel-arrow { background:#1e293b; border-color:#334155; }
+
+/* 表格微调 */
+.table-striped tbody tr:nth-child(even) { background:#F9FAFB; }
+
+/* Utility 覆盖（若Tailwind未生成自定义颜色类时备用） */
+.text-primary { color:#2C5AA0; }
+.text-danger { color:#EF4444; }
+.text-warning { color:#F59E0B; }
+.text-success { color:#10B981; }
+.bg-danger { background:#EF4444; }
+.bg-warning { background:#F59E0B; }
+.bg-success { background:#10B981; }
+
+/* 小屏菜单修正 */
+#mobile-menu a { font-size:0.875rem; }

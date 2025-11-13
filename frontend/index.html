@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LawFlow AI - 涉外法务合规审查平台</title>
+    <link rel="stylesheet" href="shared/css/style.css">
+    <link rel="stylesheet" href="shared/css/components.css">
+    <style>
+        /* 登录弹窗基础样式与显示控制 */
+        .login-modal {display:none;position:fixed;inset:0;z-index:1500;background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px;}
+        .login-modal.active {display:flex;}
+        .login-container {background:#ffffff;border-radius:14px;max-width:420px;width:100%;padding:38px 36px 30px;box-shadow:0 18px 55px -10px rgba(15,30,61,0.35);position:relative;animation:loginFade .55s cubic-bezier(.25,.8,.25,1);}
+        @keyframes loginFade {from {opacity:0;transform:translateY(26px);} to {opacity:1;transform:translateY(0);} }
+        .login-header h2 {margin:0 0 6px;font-size:1.55rem;color:#1a365d;font-weight:700;letter-spacing:.5px;}
+        .login-header p {margin:0 0 18px;font-size:.9rem;color:#4a5568;}
+        #loginForm input {width:100%;padding:12px 14px;margin:8px 0;border:1px solid #cbd5e0;border-radius:8px;font-size:.95rem;transition:.25s;background:#f8fafc;}
+        #loginForm input:focus {outline:none;border-color:#667eea;box-shadow:0 0 0 3px rgba(102,126,234,.25);} 
+        #loginForm button {width:100%;padding:14px 25px;margin-top:12px;font-size:1rem;border:none;border-radius:10px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;font-weight:600;cursor:pointer;letter-spacing:.5px;transition:.35s;}
+        #loginForm button:hover {transform:translateY(-3px);box-shadow:0 12px 30px -6px rgba(102,126,234,.55);} 
+        .close-login {position:absolute;right:16px;top:14px;font-size:24px;color:#4a5568;cursor:pointer;transition:.3s;line-height:1;}
+        .close-login:hover {color:#1a365d;transform:rotate(90deg);} 
+        .divider {margin:26px 0 14px;text-align:center;position:relative;font-size:.75rem;color:#718096;}
+        .divider span {background:#fff;padding:0 10px;position:relative;z-index:2;}
+        .divider:before {content:'';position:absolute;left:0;right:0;top:50%;height:1px;background:#e2e8f0;z-index:1;} 
+        .social-login {display:flex;justify-content:center;gap:16px;margin-top:8px;}
+        .social-btn {width:44px;height:44px;border-radius:50%;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:#4a5568;cursor:pointer;transition:.35s;box-shadow:0 4px 12px rgba(0,0,0,.08);} 
+        .social-btn:hover {background:#667eea;color:#fff;transform:translateY(-4px);} 
+        .login-links {display:flex;align-items:center;justify-content:space-between;margin-top:4px;font-size:.75rem;color:#4a5568;} 
+        .login-links a {color:#667eea;text-decoration:none;} .login-links a:hover {text-decoration:underline;} 
+        /* 飘花（logo花瓣）动画 */
+        .petals-container {position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:3;}
+        .petal {position:absolute;width:18px;height:18px;background:radial-gradient(circle at 30% 30%, #ffffff 0%, #dbeafe 60%, #93c5fd 100%);border-radius:60% 40% 55% 45%;opacity:.65;box-shadow:0 4px 10px -2px rgba(0,0,0,.25);animation:petalFloat linear infinite;}
+        @keyframes petalFloat {0% {transform:translateY(0) translateX(0) rotate(0deg);} 50% {opacity:.85;} 100% {transform:translateY(110vh) translateX(40px) rotate(360deg);} }
+        /* 功能区背景轮播容器 */
+        .features-bg-carousel {position:absolute;inset:0;z-index:0;overflow:hidden;border-radius:0;}
+        .features-bg-slide {position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity 1.2s ease-in-out;filter:brightness(.55) contrast(1.05) saturate(1.1);}
+        .features-bg-slide.active {opacity:1;}
+        .features {position:relative;}
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="shared/assets/icon/logo.png" alt="LawFlow AI Logo" class="logo-img">
+                <div class="logo-text">
+                    <h2>LawFlow AI</h2>
+                    <span>涉外法务合规审查平台</span>
+                </div>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="#home" class="nav-link">首页</a></li>
+                <li class="nav-item"><a href="#features" class="nav-link">核心功能</a></li>
+                <li class="nav-item"><a href="#workflow" class="nav-link">工作流程</a></li>
+                <li class="nav-item"><a href="#about" class="nav-link">关于我们</a></li>
+                <li class="nav-item"><a href="javascript:void(0)" class="nav-link cta-button login-trigger" data-login>登录</a></li>
+                <li class="nav-item"><a href="#features" class="nav-link cta-button">开始体验</a></li>
+                <li class="nav-item"><a href="javascript:void(0)" id="logoutBtn" class="nav-link" style="display:none;">退出</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <section id="home" class="hero">
+        <div class="hero-background">
+            <div class="world-map-bg"></div>
+            <div class="floating-shapes">
+                <div class="shape shape-1"></div>
+                <div class="shape shape-2"></div>
+                <div class="shape shape-3"></div>
+                <div class="shape shape-4"></div>
+            </div>
+            <div class="map-overlay"></div>
+            <!-- 粒子交互 Canvas 替换原飘花 -->
+            <canvas id="heroParticles" class="absolute inset-0 w-full h-full"></canvas>
+            <!-- 新增飘花容器 -->
+            <div class="petals-container" id="petalsLayer" aria-hidden="true"></div>
+        </div>
+        <div class="hero-content">
+            <h1 class="hero-title" data-i18n="hero.title">AI驱动的涉外法务合规智能平台</h1>
+            <p class="hero-subtitle">10秒风险评分 · 多语言支持 · 全球合规数据库</p>
+            <div class="hero-buttons">
+                <a href="#features" class="btn primary">探索功能</a>
+                <a href="javascript:void(0)" class="btn secondary login-trigger" data-login>登录使用</a>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <span>向下滚动</span>
+            <div class="arrow"></div>
+        </div>
+    </section>
+
+    <section class="values">
+        <div class="container">
+            <h2 class="section-title">为什么选择 LawFlow AI</h2>
+            <div class="values-grid">
+                <div class="value-card">
+                    <div class="value-icon">⚡</div>
+                    <h3>极速审查</h3>
+                    <p>上传合同后10秒内生成风险评分，大幅提升工作效率</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon">🌐</div>
+                    <h3>多语言支持</h3>
+                    <p>支持中、英、日、德等多种语言合同审查与翻译</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon">📊</div>
+                    <h3>智能分析</h3>
+                    <p>基于AI算法深度分析合同条款，识别潜在风险点</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon">🛡️</div>
+                    <h3>合规保障</h3>
+                    <p>对接全球合规数据库，确保符合各国法律法规</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="features">
+        <div class="features-bg-carousel" id="featuresBg">
+            <div class="features-bg-slide" style="background-image:url('shared/assets/images/1.png')"></div>
+            <div class="features-bg-slide" style="background-image:url('shared/assets/images/2.png')"></div>
+            <div class="features-bg-slide" style="background-image:url('shared/assets/images/3.png')"></div>
+        </div>
+        <div class="container">
+            <h2 class="section-title">核心功能</h2>
+            <div class="features-grid">
+                <div class="feature-card" data-target="agent">
+                    <div class="card-icon">🤖</div>
+                    <h3>智能合规问答机器人</h3>
+                    <p class="card-description">AI驱动的智能问答系统，为您提供实时合规咨询和问题解答</p>
+                    <div class="card-hover-content">
+                        <div>
+                            <h4>核心特性</h4>
+                            <ul>
+                                <li>7×24小时在线咨询服务</li>
+                                <li>多行业合规标准支持</li>
+                                <li>智能语义理解与匹配</li>
+                                <li>实时法规更新推送</li>
+                            </ul>
+                        </div>
+                        <a href="pages/agent.html" class="enter-btn">进入功能</a>
+                    </div>
+                </div>
+
+                <div class="feature-card" data-target="contract">
+                    <div class="card-icon">📄</div>
+                    <h3>涉外合同审查</h3>
+                    <p class="card-description">全流程合同风险智能审查，10秒生成专业风险评估报告</p>
+                    <div class="card-hover-content">
+                        <div>
+                            <h4>审查范畴</h4>
+                            <ul>
+                                <li>采购合同审查</li>
+                                <li>税务相关审查</li>
+                                <li>商品交易审查</li>
+                                <li>劳务合同审查</li>
+                            </ul>
+                        </div>
+                        <a href="pages/contract.html" class="enter-btn">进入功能</a>
+                    </div>
+                </div>
+
+                <div class="feature-card" data-target="radar">
+                    <div class="card-icon">📡</div>
+                    <h3>跨国行业合规热点雷达</h3>
+                    <p class="card-description">实时监控行业合规动态，预警潜在风险</p>
+                    <div class="card-hover-content">
+                        <div>
+                            <h4>监控范围</h4>
+                            <ul>
+                                <li>政策法规变化追踪</li>
+                                <li>行业风险事件预警</li>
+                                <li>合规趋势分析</li>
+                                <li>最佳实践分享</li>
+                            </ul>
+                        </div>
+                        <a href="pages/radar.html" class="enter-btn">进入功能</a>
+                    </div>
+                </div>
+
+                <div class="feature-card" data-target="community">
+                    <div class="card-icon">👥</div>
+                    <h3>多语言跨国交流社区</h3>
+                    <p class="card-description">专业合规人士交流平台，共享经验与见解</p>
+                    <div class="card-hover-content">
+                        <div>
+                            <h4>社区特色</h4>
+                            <ul>
+                                <li>专家在线答疑</li>
+                                <li>案例经验分享</li>
+                                <li>合规知识库</li>
+                                <li>行业交流活动</li>
+                            </ul>
+                        </div>
+                        <a href="pages/community.html" class="enter-btn">进入功能</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="workflow" class="workflow">
+        <div class="container">
+            <h2 class="section-title">智能审查工作流程</h2>
+            <div class="workflow-container">
+                <div class="workflow-steps">
+                    <div class="step active" data-step="1">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>上传合同</h3>
+                            <p>支持PDF、Word等多种格式</p>
+                        </div>
+                    </div>
+                    <div class="step" data-step="2">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>AI风险评分</h3>
+                            <p>10秒内生成高中低风险评级</p>
+                        </div>
+                    </div>
+                    <div class="step" data-step="3">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>案例匹配</h3>
+                            <p>比对相似案例与历史数据</p>
+                        </div>
+                    </div>
+                    <div class="step" data-step="4">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h3>生成修改建议</h3>
+                            <p>提供具体条款优化方案</p>
+                        </div>
+                    </div>
+                    <div class="step" data-step="5">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <h3>输出优化合同</h3>
+                            <p>直接获得可使用的完善版本</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="workflow-visualization">
+                    <div class="visualization-content">
+                        <div class="step-detail" id="step-detail-1">
+                            <h3>智能上传与解析</h3>
+                            <p>LawFlow AI支持多种文档格式上传，自动识别文档结构，提取关键条款信息。</p>
+                            <div class="upload-demo">
+                                <div class="file-icon">📄</div>
+                                <div class="upload-progress">
+                                    <div class="progress-bar"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="step-detail hidden" id="step-detail-2">
+                            <h3>AI风险评分系统</h3>
+                            <p>基于深度学习算法，快速分析合同条款，识别潜在法律风险与合规问题。</p>
+                            <div class="risk-meter">
+                                <div class="meter-scale">
+                                    <div class="low-risk">低风险</div>
+                                    <div class="medium-risk">中风险</div>
+                                    <div class="high-risk">高风险</div>
+                                </div>
+                                <div class="meter-needle"></div>
+                            </div>
+                        </div>
+                        <div class="step-detail hidden" id="step-detail-3">
+                            <h3>智能案例匹配</h3>
+                            <p>从海量案例库中寻找相似情境，提供历史处理方案作为参考。</p>
+                            <div class="case-match">
+                                <div class="case-item matched">相似度 92%</div>
+                                <div class="case-item">相似度 87%</div>
+                                <div class="case-item">相似度 79%</div>
+                            </div>
+                        </div>
+                        <div class="step-detail hidden" id="step-detail-4">
+                            <h3>专业修改建议</h3>
+                            <p>基于风险点与最佳实践，生成具体、可操作的条款修改建议。</p>
+                            <div class="suggestion-box">
+                                <div class="suggestion-item">
+                                    <span class="risk-tag high">高风险</span>
+                                    <p>第7条责任限制条款过于宽泛，建议增加具体限制条件。</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="step-detail hidden" id="step-detail-5">
+                            <h3>优化合同输出</h3>
+                            <p>生成标记修改痕迹的完善版本，可直接用于商务谈判或签署。</p>
+                            <div class="contract-preview">
+                                <div class="contract-page">
+                                    <div class="page-header">优化后的合同草案</div>
+                                    <div class="page-content">
+                                        <div class="revision added">新增条款</div>
+                                        <div class="revision modified">修改条款</div>
+                                        <div class="revision deleted">删除条款</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>LawFlow AI</h3>
+                    <p>涉外法务合规审查平台</p>
+                    <div class="social-links">
+                        <a href="#">LinkedIn</a>
+                        <a href="#">Twitter</a>
+                        <a href="#">WeChat</a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>产品</h4>
+                    <ul>
+                        <li><a href="pages/agent.html" class="login-required">智能问答机器人</a></li>
+                        <li><a href="pages/contract.html" class="login-required">合同审查</a></li>
+                        <li><a href="pages/radar.html" class="login-required">合规热点雷达</a></li>
+                        <li><a href="pages/community.html" class="login-required">交流社区</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>公司</h4>
+                    <ul>
+                        <li><a href="#">关于我们</a></li>
+                        <li><a href="#">新闻动态</a></li>
+                        <li><a href="#">招贤纳士</a></li>
+                        <li><a href="#">联系我们</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>法律</h4>
+                    <ul>
+                        <li><a href="#">隐私政策</a></li>
+                        <li><a href="#">服务条款</a></li>
+                        <li><a href="#">Cookie政策</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 LawFlow AI. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 登录弹窗（修复容器结构错误） -->
+    <div id="loginSection" class="login-modal">
+        <div class="login-container">
+            <span class="close-login">&times;</span>
+            <div class="login-header">
+                <h2>账号登录</h2>
+                <p>登录后即可同步个人偏好（目前访问功能不再强制登录）</p>
+            </div>
+            <form id="loginForm">
+                <input type="text" id="username" placeholder="用户名/手机号/邮箱" required>
+                <input type="password" id="password" placeholder="请输入密码" required>
+                <div class="login-links">
+                    <label>
+                        <input type="checkbox" style="width: auto; margin-right: 5px;"> 记住我
+                    </label>
+                    <a href="#">忘记密码？</a>  
+                </div>
+                <button type="submit">登录账号</button>
+            </form>
+            <div class="divider"><span>其他登录方式</span></div>
+            <div class="social-login">
+                <div class="social-btn"><i>📱</i></div>
+                <div class="social-btn"><i>📧</i></div>
+                <div class="social-btn"><i>🌐</i></div>
+            </div>
+            <div style="text-align: center; margin-top: 20px; font-size: 14px;">还没有账号？<a href="#" style="color: #1a73e8;">立即注册</a></div>
+        </div>
+    </div>
+
+    <!-- Toast 容器 -->
+    <div id="toast" style="position:fixed;left:50%;top:80px;transform:translateX(-50%);background:#1a365d;color:#fff;padding:10px 18px;border-radius:6px;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;z-index:2000;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,.2);"></div>
+
+    <script src="shared/js/api.js"></script>
+    <script src="shared/js/script.js"></script>
+    <script>
+        // 交互粒子（靠近鼠标减速滞停）
+        (function initHeroParticles(){
+            const cvs = document.getElementById('heroParticles'); if(!cvs) return; const ctx = cvs.getContext('2d');
+            function resize(){ cvs.width = cvs.clientWidth; cvs.height = cvs.clientHeight; }
+            window.addEventListener('resize', resize); resize();
+            const PARTICLE_COUNT = 100; const particles=[]; let mouse={x:-999,y:-999};
+            for(let i=0;i<PARTICLE_COUNT;i++){
+                particles.push({
+                    x: Math.random()*cvs.width,
+                    y: Math.random()*cvs.height,
+                    vx: -0.4 + Math.random()*0.8,
+                    vy: -0.4 + Math.random()*0.8,
+                    r: 0.5 + Math.random()*1.1,
+                    hue: 200 + Math.random()*60
+                });
+            }
+            cvs.addEventListener('mousemove', e=>{ const rect=cvs.getBoundingClientRect(); mouse.x=e.clientX-rect.left; mouse.y=e.clientY-rect.top; });
+            cvs.addEventListener('mouseleave', ()=>{ mouse.x=-999; mouse.y=-999; });
+            function step(){
+                ctx.clearRect(0,0,cvs.width,cvs.height);
+                particles.forEach(p=>{
+                    const dx = p.x - mouse.x; const dy = p.y - mouse.y; const dist = Math.sqrt(dx*dx+dy*dy);
+                    if(dist < 110){ // 滞停减速
+                        p.vx *= 0.92; p.vy *= 0.92;
+                        if(dist < 40){ p.vx += dx/dist*0.12; p.vy += dy/dist*0.12; }
+                    } else { // 轻微恢复速度
+                        p.vx += (-0.4 + Math.random()*0.8)*0.005; p.vy += (-0.4 + Math.random()*0.8)*0.005;
+                        p.vx = Math.max(-1.2, Math.min(1.2, p.vx)); p.vy = Math.max(-1.2, Math.min(1.2, p.vy));
+                    }
+                    p.x += p.vx; p.y += p.vy;
+                    if(p.x < -10) p.x = cvs.width+10; if(p.x > cvs.width+10) p.x = -10;
+                    if(p.y < -10) p.y = cvs.height+10; if(p.y > cvs.height+10) p.y = -10;
+                    ctx.beginPath(); ctx.fillStyle = `hsla(${p.hue},75%,70%,0.35)`; ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+                });
+                requestAnimationFrame(step);
+            }
+            step();
+        })();
+
+        // 英雄区新增花瓣飘落（低性能设备自动降级）
+        (function initPetals(){
+            const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if(prefersReduced) return; // 尊重用户减少动画
+            const layer = document.getElementById('petalsLayer'); if(!layer) return;
+            const PETAL_COUNT = 30;
+            for(let i=0;i<PETAL_COUNT;i++){
+                const div = document.createElement('div'); div.className='petal';
+                const startX = Math.random()*100; // vw
+                const delay = Math.random()*8;
+                const duration = 18 + Math.random()*12;
+                div.style.left = startX + 'vw';
+                div.style.top = (-10 - Math.random()*20) + 'px';
+                div.style.animationDuration = duration + 's';
+                div.style.animationDelay = delay + 's';
+                div.style.transform = `rotate(${Math.random()*360}deg)`;
+                div.style.opacity = 0.4 + Math.random()*0.25;
+                if(Math.random()<0.35) div.style.filter='blur(1.5px) brightness(1.05)';
+                div.style.width = (8 + Math.random()*10) + 'px';
+                div.style.height = div.style.width;
+                layer.appendChild(div);
+            }
+            // 周期补充避免空窗
+            setInterval(()=>{
+                const extra = document.createElement('div'); extra.className='petal';
+                extra.style.left = Math.random()*100 + 'vw';
+                extra.style.top = '-18px';
+                extra.style.animationDuration = (15 + Math.random()*10) + 's';
+                extra.style.animationDelay = '0s';
+                extra.style.width = (8 + Math.random()*10) + 'px';
+                extra.style.height = extra.style.width;
+                extra.style.opacity = 0.35 + Math.random()*0.25;
+                layer.appendChild(extra);
+                // 清理已经落到底部的 > 120 个则裁剪
+                if(layer.children.length > 120){
+                    for(let k=0;k<20;k++){ if(layer.firstChild) layer.removeChild(layer.firstChild); }
+                }
+            }, 5000);
+        })();
+
+        // 英雄按钮柔和描边（已移除文字闪光效果）
+        (function enhanceHero(){
+            document.querySelectorAll('.hero-buttons .btn').forEach(btn=>{
+                btn.classList.add('glow-btn');
+            });
+            const style = document.createElement('style'); style.textContent=`
+                .glow-btn { position:relative; overflow:hidden; }
+                .glow-btn:before { content:''; position:absolute; inset:0; border:1px solid rgba(255,255,255,.28); border-radius:inherit; pointer-events:none; }
+                .glow-btn:after { content:''; position:absolute; top:-120%; left:-120%; width:300%; height:300%; background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.28), rgba(255,255,255,0) 70%); opacity:0; transition:.6s; }
+                .glow-btn:hover:after { opacity:.9; transform:translate(25px,25px); }
+            `; document.head.appendChild(style);
+        })();
+
+        // 功能区背景轮播
+        (function initFeaturesBg(){
+            const slides = Array.from(document.querySelectorAll('.features-bg-slide'));
+            if(!slides.length) return; let idx = 0; slides[0].classList.add('active');
+            setInterval(()=>{slides[idx].classList.remove('active'); idx = (idx+1)%slides.length; slides[idx].classList.add('active');}, 4500);
+        })();
+
+        function showToast(msg, type='info'){const t=document.getElementById('toast');t.textContent=msg;t.style.background=type==='error'?'#c53030':(type==='success'?'#2f855a':'#1a365d');t.style.opacity='1';t.style.transform='translateX(-50%) translateY(0)';clearTimeout(window.__toastTimer);window.__toastTimer=setTimeout(()=>{t.style.opacity='0';},2600);}    
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginModal = document.getElementById('loginSection');
+            const loginTriggers = document.querySelectorAll('.login-trigger');
+            const closeLogin = document.querySelector('.close-login');
+            const loginForm = document.getElementById('loginForm');
+
+            let sessionId = localStorage.getItem('lf_session_id') || null;
+            let userName = localStorage.getItem('lf_user_name') || null;
+            const backendHealthUrl = '/api/login'; // 用于探测后端是否可达（不会真正登录）
+
+            // 检测后端联通性（GET会405，用fetch再看是否CORS/网络错误）
+            fetch(backendHealthUrl,{method:'OPTIONS'}).catch(err=>console.warn('后端预检失败(可忽略)',err));
+
+            function isLoggedIn(){return !!sessionId;}
+            function openLogin(){ loginModal.classList.add('active'); document.body.style.overflow='hidden'; }
+            function closeLoginModal(){ loginModal.classList.remove('active'); document.body.style.overflow=''; }
+
+            loginTriggers.forEach(btn=>btn.addEventListener('click', e=>{ if(!isLoggedIn()){ openLogin(); } else { showToast('已登录: '+(userName||'账户'),'success'); } }));
+            closeLogin.addEventListener('click', closeLoginModal);
+            loginModal.addEventListener('click', e=>{ if(e.target===loginModal) closeLoginModal(); });
+
+            loginForm.addEventListener('submit', async function(e){
+                e.preventDefault();
+                const username = document.getElementById('username').value.trim();
+                const password = document.getElementById('password').value.trim();
+                if(!username||!password){ showToast('请输入完整信息','error'); return; }
+                try {
+                    const data = await FlowLawAPI.login(username, password);
+                    if(data.success){
+                        sessionId = data.session_id; userName = data.user.name;
+                        localStorage.setItem('lf_session_id', sessionId);
+                        localStorage.setItem('lf_user_name', userName);
+                        showToast('登录成功，欢迎 '+ userName,'success');
+                        updateLoginUI();
+                        closeLoginModal();
+                    } else {
+                        showToast(data.message||'登录失败','error');
+                    }
+                } catch(err){
+                    console.error('登录请求异常: ', err);
+                    showToast('无法连接后端，请确认Flask在 http://localhost:5000 运行','error');
+                }
+            });
+
+            function updateLoginUI(){
+                const loginButtons = document.querySelectorAll('.login-trigger');
+                const logoutBtn = document.getElementById('logoutBtn');
+                if(isLoggedIn()){
+                    loginButtons.forEach(btn=>{ btn.textContent = userName ? (userName + '（账号）') : '我的账号'; btn.setAttribute('data-logged-in','true'); });
+                    if(logoutBtn) logoutBtn.style.display='inline-block';
+                } else {
+                    loginButtons.forEach(btn=>{ btn.textContent='登录'; btn.removeAttribute('data-logged-in'); });
+                    if(logoutBtn) logoutBtn.style.display='none';
+                }
+                // 确保滚动可用（防止溢出锁定残留）
+                document.body.style.overflowY = 'auto';
+            }
+            updateLoginUI();
+
+            // 绑定退出
+            const logoutBtn = document.getElementById('logoutBtn');
+            if(logoutBtn){
+                logoutBtn.setAttribute('data-action','logout');
+            }
+            // 添加全局主题切换按钮（若需要可在导航追加）示例：
+            const navMenu = document.querySelector('.nav-menu');
+            if(navMenu && !document.getElementById('themeToggleNav')){
+                const li=document.createElement('li'); li.className='nav-item';
+                li.innerHTML='<a id="themeToggleNav" data-action="toggle-theme" class="nav-link" href="javascript:void(0)">深/浅色</a>';
+                navMenu.appendChild(li);
+            }
+        });
+    </script>
+</body>
+</html>

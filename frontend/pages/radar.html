@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>合规热点雷达 - 全球行业合规监测系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/map/js/world.js"></script>
+    <!-- 共享脚本与 API -->
+    <script src="../shared/js/api.js"></script>
+    <script src="../shared/js/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="css/radar.css">
+</head>
+<body class="radar-body font-sans">
+    <nav class="glass-nav">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <a href="../index.html" class="flex items-center">
+                    <img src="../shared/assets/icon/logo.png" alt="Logo" class="h-8 w-auto" id="logo-image">
+                    <span class="ml-2 text-xl font-bold text-primary">LawFlow AI</span>
+                </a>
+            </div>
+            
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="../index.html" class="text-gray-200 hover:text-white transition-all">首页</a>
+                <a href="#worldMapSection" class="text-gray-200 hover:text-white transition-all">全球热点</a>
+                <a href="#trendChart" class="text-gray-200 hover:text-white transition-all">趋势分析</a>
+                <a href="#industryChart" class="text-gray-200 hover:text-white transition-all">行业分布</a>
+                <a href="javascript:void(0)" data-action="toggle-theme" class="px-3 py-2 rounded bg-white/10 hover:bg-white/20 text-xs text-gray-100">深/浅色</a>
+                <a href="javascript:void(0)" data-action="logout" class="px-4 py-2 rounded bg-primary hover:bg-secondary text-white text-xs">退出</a>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <button class="btn-primary hidden md:block" data-action="logout">退出</button>
+                
+                <button class="md:hidden text-gray-600 focus:outline-none" id="mobile-menu-button">
+                    <i class="fa fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="md:hidden hidden bg-white shadow-lg absolute w-full z-10" id="mobile-menu">
+            <div class="container mx-auto px-4 py-2 flex flex-col space-y-3">
+                <a href="../index.html" class="text-gray-600 hover:text-primary py-2 transition-all">首页</a>
+                <a href="#" class="text-gray-600 hover:text-primary py-2 transition-all">合规雷达</a>
+                <a href="#" class="text-gray-600 hover:text-primary py-2 transition-all">法规库</a>
+                <a href="#" class="text-gray-600 hover:text-primary py-2 transition-all">智能咨询</a>
+                <a href="#" class="text-gray-600 hover:text-primary py-2 transition-all">关于我们</a>
+                <button class="btn-primary w-full">登录 / 注册</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-6 relative" id="worldMapSection">
+        <div class="radar-blob" style="left:15%; top:20%;"></div>
+        <div class="radar-blob" style="left:70%; top:25%;"></div>
+        <div class="radar-blob" style="left:20%; top:65%;"></div>
+        <div class="mb-8 text-center">
+            <h1 class="text-3xl font-bold mb-2 text-white drop-shadow">合规热点雷达</h1>
+            <p class="text-sm text-white/80">实时监测全球各行业最新合规政策变化，提前预警合规风险</p>
+        </div>
+        
+        <div class="flex flex-col lg:flex-row gap-6">
+            <div class="lg:w-1/4 bg-white/80 backdrop-blur-md rounded-lg shadow-card p-4 radar-filter-col">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">筛选条件</h2>
+                <div class="grid grid-cols-3 gap-3 mb-5 text-center text-xs" id="quickStats">
+                    <div class="p-3 rounded bg-white/70 shadow-sm flex flex-col gap-1">
+                        <span class="text-[10px] tracking-wide text-gray-500">本月新增</span>
+                        <strong class="text-lg text-primary" id="statMonthly">--</strong>
+                    </div>
+                    <div class="p-3 rounded bg-white/70 shadow-sm flex flex-col gap-1">
+                        <span class="text-[10px] tracking-wide text-gray-500">高风险</span>
+                        <strong class="text-lg text-danger" id="statHigh">--</strong>
+                    </div>
+                    <div class="p-3 rounded bg-white/70 shadow-sm flex flex-col gap-1">
+                        <span class="text-[10px] tracking-wide text-gray-500">监测国家</span>
+                        <strong class="text-lg text-warning" id="statCountries">--</strong>
+                    </div>
+                </div>
+                <div class="h-36 mb-6" id="riskMiniChart"></div>
+                
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">地区选择</label>
+                    <div class="relative">
+                        <select class="w-full border border-gray-300 rounded-md px-3 py-2 appearance-none focus:outline-none focus:ring-2 focus:ring-primary">
+                            <option value="all">全部地区</option>
+                            <option value="asia">亚洲</option>
+                            <option value="europe">欧洲</option>
+                            <option value="namerica">北美洲</option>
+                            <option value="samerica">南美洲</option>
+                            <option value="africa">非洲</option>
+                            <option value="oceania">大洋洲</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                            <i class="fa fa-chevron-down"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">重点国家/地区</label>
+                    <div class="space-y-2 max-h-40 overflow-y-auto">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="country-cn" class="rounded text-primary focus:ring-primary">
+                            <label for="country-cn" class="ml-2 text-gray-700">中国</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="country-us" class="rounded text-primary focus:ring-primary">
+                            <label for="country-us" class="ml-2 text-gray-700">美国</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="country-eu" class="rounded text-primary focus:ring-primary">
+                            <label for="country-eu" class="ml-2 text-gray-700">欧盟</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="country-jp" class="rounded text-primary focus:ring-primary">
+                            <label for="country-jp" class="ml-2 text-gray-700">日本</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="country-gb" class="rounded text-primary focus:ring-primary">
+                            <label for="country-gb" class="ml-2 text-gray-700">英国</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="country-sg" class="rounded text-primary focus:ring-primary">
+                            <label for="country-sg" class="ml-2 text-gray-700">新加坡</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="country-hk" class="rounded text-primary focus:ring-primary">
+                            <label for="country-hk" class="ml-2 text-gray-700">中国香港</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">行业分类</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="industry-finance" class="rounded text-primary focus:ring-primary">
+                            <label for="industry-finance" class="ml-2 text-gray-700">金融</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="industry-trade" class="rounded text-primary focus:ring-primary">
+                            <label for="industry-trade" class="ml-2 text-gray-700">贸易</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="industry-data" class="rounded text-primary focus:ring-primary">
+                            <label for="industry-data" class="ml-2 text-gray-700">数据安全</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="industry-tech" class="rounded text-primary focus:ring-primary">
+                            <label for="industry-tech" class="ml-2 text-gray-700">科技</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="industry-energy" class="rounded text-primary focus:ring-primary">
+                            <label for="industry-energy" class="ml-2 text-gray-700">能源</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="industry-pharma" class="rounded text-primary focus:ring-primary">
+                            <label for="industry-pharma" class="ml-2 text-gray-700">医药</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">时间范围</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-gray-500 text-xs mb-1">开始日期</label>
+                            <input type="date" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+                        </div>
+                        <div>
+                            <label class="block text-gray-500 text-xs mb-1">结束日期</label>
+                            <input type="date" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">风险等级</label>
+                    <div class="space-y-2">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="risk-high" class="rounded text-danger focus:ring-danger">
+                            <label for="risk-high" class="ml-2 flex items-center">
+                                <span class="inline-block w-3 h-3 bg-danger rounded-full mr-1"></span>
+                                高风险
+                            </label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="risk-medium" class="rounded text-warning focus:ring-warning">
+                            <label for="risk-medium" class="ml-2 flex items-center">
+                                <span class="inline-block w-3 h-3 bg-warning rounded-full mr-1"></span>
+                                中风险
+                            </label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="risk-low" class="rounded text-success focus:ring-success">
+                            <label for="risk-low" class="ml-2 flex items-center">
+                                <span class="inline-block w-3 h-3 bg-success rounded-full mr-1"></span>
+                                低风险
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">关键词搜索</label>
+                    <div class="relative">
+                        <input type="text" placeholder="输入关键词搜索..." class="w-full border border-gray-300 rounded-md pl-10 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <i class="fa fa-search text-gray-400"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex space-x-2">
+                    <button class="btn-primary flex-1">
+                        <i class="fa fa-filter mr-1"></i> 筛选
+                    </button>
+                    <button class="btn-outline flex-1">
+                        <i class="fa fa-refresh mr-1"></i> 重置
+                    </button>
+                </div>
+            </div>
+            
+            <div class="lg:w-3/4 space-y-6">
+                <div class="w-full h-16 relative overflow-hidden rounded-lg mb-4 bg-white/70 backdrop-blur-md border border-gray-200" id="regCascade">
+                    <!-- 数字瀑布动画容器 -->
+                </div>
+                <div class="bg-white rounded-lg shadow-card p-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold text-gray-800">全球合规热点分布</h2>
+                        <div class="text-sm text-gray-500">
+                            <span>最后更新: 2025-10-28 17:45</span>
+                        </div>
+                    </div>
+                    <div class="relative w-full h-[440px] border border-gray-200 rounded-lg overflow-hidden" id="hotspot-map">
+                        <!-- 使用新的背景图 background2 -->
+                        <img src="../shared/assets/images/map.jfif" alt="静态世界地图" class="absolute inset-0 w-full h-full object-cover opacity-70">
+                        <div class="absolute inset-0 bg-gradient-to-br from-blue-950/50 via-blue-900/35 to-blue-800/40 backdrop-blur-[2px]"></div>
+                        <!-- 动态雷达扫描层 -->
+                        <div id="radar-scan" aria-hidden="true"></div>
+                        <!-- 粒子细点层 -->
+                        <canvas id="radarParticles" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
+                        <!-- 热点国家标记层 -->
+                        <div class="absolute inset-0 pointer-events-none" id="hotspot-layer">
+                            <button class="hotspot-pin high" style="left:51%; top:34%;" data-country="英国" aria-label="英国高风险" tabindex="0"></button>
+                            <button class="hotspot-pin warning" style="left:56%; top:38%;" data-country="德国" aria-label="德国中风险" tabindex="0"></button>
+                            <button class="hotspot-pin danger" style="left:63%; top:42%;" data-country="欧盟" aria-label="欧盟高风险" tabindex="0"></button>
+                            <button class="hotspot-pin success" style="left:37%; top:47%;" data-country="美国" aria-label="美国低风险" tabindex="0"></button>
+                            <button class="hotspot-pin warning" style="left:75%; top:46%;" data-country="中国" aria-label="中国中风险" tabindex="0"></button>
+                            <button class="hotspot-pin danger" style="left:79%; top:53%;" data-country="新加坡" aria-label="新加坡高风险" tabindex="0"></button>
+                            <button class="hotspot-pin success" style="left:83%; top:57%;" data-country="中国香港" aria-label="中国香港低风险" tabindex="0"></button>
+                            <button class="hotspot-pin warning" style="left:69%; top:63%;" data-country="澳大利亚" aria-label="澳大利亚中风险" tabindex="0"></button>
+                        </div>
+                    </div>
+                    <div class="mt-3 flex flex-wrap gap-3 text-sm text-gray-600">
+                        <div class="flex items-center"><i class="fa fa-search-plus text-primary mr-1"></i> 缩放地图</div>
+                        <div class="flex items-center"><i class="fa fa-hand-pointer-o text-primary mr-1"></i> 点击查看详情</div>
+                        <div class="flex items-center"><i class="fa fa-arrows text-primary mr-1"></i> 拖动平移</div>
+                        <div class="flex items-center"><i class="fa fa-download text-primary mr-1"></i> 保存地图</div>
+                    </div>
+                    <div class="mt-2 flex gap-4 text-sm">
+                        <div class="flex items-center"><span class="w-3 h-3 bg-danger rounded-full mr-1"></span> 高风险</div>
+                        <div class="flex items-center"><span class="w-3 h-3 bg-warning rounded-full mr-1"></span> 中风险</div>
+                        <div class="flex items-center"><span class="w-3 h-3 bg-success rounded-full mr-1"></span> 低风险</div>
+                    </div>
+                    <div id="compliance-panel" class="mt-4 p-4 bg-white/95 backdrop-blur-md rounded-xl border border-gray-200 shadow-xl hidden absolute z-50 w-[380px]" data-arrow="top">
+                        <div class="panel-arrow" aria-hidden="true"></div>
+                        <div class="flex justify-between items-start">
+                            <h3 id="panel-country" class="text-lg font-semibold text-primary flex items-center gap-2"></h3>
+                            <button id="close-panel" class="text-gray-400 hover:text-gray-600 transition-colors">
+                                <i class="fa fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-1 gap-2 mt-3">
+                            <div>
+                                <p class="text-sm text-gray-500">风险等级</p>
+                                <p id="panel-risk" class="font-medium text-lg mt-1"></p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">政策更新</p>
+                                <p id="panel-updates" class="font-medium text-lg mt-1 text-primary"></p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">影响行业</p>
+                                <p id="panel-industries" class="font-medium text-lg mt-1"></p>
+                            </div>
+                        </div>
+                        <div class="mt-4 space-y-3">
+                            <div>
+                                <h4 class="font-medium text-gray-800 flex items-center gap-1"><i class="fa fa-info-circle text-primary"></i> 概览</h4>
+                                <div id="panel-overview" class="mt-2 p-3 bg-white rounded border border-gray-200 text-gray-600 text-sm leading-relaxed"></div>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-800 flex items-center gap-1"><i class="fa fa-bolt text-danger"></i> 最新政策动态</h4>
+                                <div id="panel-news" class="mt-2 p-3 bg-white rounded border border-gray-200 text-gray-600 text-sm"></div>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-800 flex items-center gap-1"><i class="fa fa-lightbulb-o text-warning"></i> 建议行动</h4>
+                                <ul id="panel-actions" class="mt-2 space-y-1 text-sm text-gray-700 list-disc pl-5"></ul>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex gap-2">
+                            <button class="btn-primary text-sm flex-1">
+                                <i class="fa fa-file-text-o mr-1"></i> 生成合规报告
+                            </button>
+                            <button class="btn-outline text-sm flex-1">
+                                <i class="fa fa-bell-o mr-1"></i> 设置提醒
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-white rounded-lg shadow-card p-4 card-hover">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-lg font-medium text-gray-800">政策更新</h3>
+                            <span class="text-primary"><i class="fa fa-file-text-o text-xl"></i></span>
+                        </div>
+                        <p class="text-3xl font-bold text-gray-800">245</p>
+                        <p class="text-sm text-gray-500 mt-1">过去30天内全球政策更新数量</p>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-card p-4 card-hover">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-lg font-medium text-gray-800">高风险预警</h3>
+                            <span class="text-danger"><i class="fa fa-exclamation-triangle text-xl"></i></span>
+                        </div>
+                        <p class="text-3xl font-bold text-gray-800">37</p>
+                        <p class="text-sm text-gray-500 mt-1">需要重点关注的高风险政策变化</p>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-card p-4 card-hover">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-lg font-medium text-gray-800">受影响国家</h3>
+                            <span class="text-warning"><i class="fa fa-globe text-xl"></i></span>
+                        </div>
+                        <p class="text-3xl font-bold text-gray-800">42</p>
+                        <p class="text-sm text-gray-500 mt-1">近期政策变化涉及的国家/地区数量</p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 bg-white rounded-lg shadow-card p-4">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-semibold text-gray-800">最新合规动态</h2>
+                            <a href="#" class="text-primary hover:underline text-sm">查看全部</a>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div class="border-b border-gray-100 pb-4 last:border-0 last:pb-0">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <span class="badge badge-danger mb-1" aria-label="高风险预警">高风险</span>
+                                        <h3 class="text-lg font-medium text-gray-800">欧盟《数字服务法案》正式实施</h3>
+                                        <p class="text-gray-600 text-sm mt-1">欧盟</p>
+                                    </div>
+                                    <span class="text-gray-400 text-sm">2小时前</span>
+                                </div>
+                                <p class="text-gray-600 mt-2">新法案要求在线平台对其内容承担更多责任，并赋予监管机构更大的执法权力，可能对科技公司产生重大影响。</p>
+                                <div class="flex items-center mt-2 text-sm">
+                                    <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded">科技</span>
+                                    <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2 py-0.5 rounded ml-2">数据安全</span>
+                                </div>
+                            </div>
+                            
+                            <div class="border-b border-gray-100 pb-4 last:border-0 last:pb-0">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <span class="badge badge-warning mb-1" aria-label="中风险提示">中风险</span>
+                                        <h3 class="text-lg font-medium text-gray-800">美国SEC更新加密资产监管框架</h3>
+                                        <p class="text-gray-600 text-sm mt-1">美国</p>
+                                    </div>
+                                    <span class="text-gray-400 text-sm">5小时前</span>
+                                </div>
+                                <p class="text-gray-600 mt-2">美国证券交易委员会发布了新的加密资产监管框架，明确了哪些加密资产将被视为证券，需遵守相关证券法规定。</p>
+                                <div class="flex items-center mt-2 text-sm">
+                                    <span class="bg-green-100 text-green-800 text-xs font-medium px-2 py-0.5 rounded">金融</span>
+                                    <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded ml-2">科技</span>
+                                </div>
+                            </div>
+                            
+                            <div class="border-b border-gray-100 pb-4 last:border-0 last:pb-0">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <span class="badge badge-success mb-1" aria-label="低风险信息">低风险</span>
+                                        <h3 class="text-lg font-medium text-gray-800">新加坡修订《个人数据保护法》</h3>
+                                        <p class="text-gray-600 text-sm mt-1">新加坡</p>
+                                    </div>
+                                    <span class="text-gray-400 text-sm">1天前</span>
+                                </div>
+                                <p class="text-gray-600 mt-2">新加坡个人数据保护委员会宣布修订《个人数据保护法》，增强消费者数据控制权，同时为企业提供更清晰的合规指引。</p>
+                                <div class="flex items-center mt-2 text-sm">
+                                    <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2 py-0.5 rounded">数据安全</span>
+                                </div>
+                            </div>
+                            
+                            <div class="border-b border-gray-100 pb-4 last:border-0 last:pb-0">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <span class="badge badge-warning mb-1">中风险</span>
+                                        <h3 class="text-lg font-medium text-gray-800">中国发布《网络数据安全管理条例》</h3>
+                                        <p class="text-gray-600 text-sm mt-1">中国</p>
+                                    </div>
+                                    <span class="text-gray-400 text-sm">2天前</span>
+                                </div>
+                                <p class="text-gray-600 mt-2">中国国家互联网信息办公室发布《网络数据安全管理条例》，进一步规范数据处理活动，加强个人信息保护。</p>
+                                <div class="flex items-center mt-2 text-sm">
+                                    <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2 py-0.5 rounded">数据安全</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 text-center">
+                            <button class="btn-outline">
+                                加载更多 <i class="fa fa-angle-down ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-card p-4">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-semibold text-gray-800">合规政策趋势</h2>
+                            <div class="flex space-x-1">
+                                <button class="px-2 py-1 text-xs bg-primary text-white rounded">月度</button>
+                                <button class="px-2 py-1 text-xs bg-gray-200 text-gray-700 rounded">季度</button>
+                                <button class="px-2 py-1 text-xs bg-gray-200 text-gray-700 rounded">年度</button>
+                            </div>
+                        </div>
+                        <div id="trendChart" class="h-[300px]"></div>
+                        <div class="mt-6">
+                            <h3 class="text-lg font-medium text-gray-800 mb-3">行业分布</h3>
+                            <div id="industryChart" class="h-[200px]"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-card p-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold text-gray-800">重点关注提醒</h2>
+                        <button class="btn-primary text-sm py-1 px-3">
+                            <i class="fa fa-bell-o mr-1"></i> 设置提醒
+                        </button>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead>
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">政策名称</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">国家/地区</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">行业</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">风险等级</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">生效日期</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-gray-900">欧盟《数字服务法案》</div>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <div class="text-sm text-gray-700">欧盟</div>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <div class="text-sm text-gray-700">科技、数据安全</div>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <span class="badge badge-danger">高风险</span>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                                        2025-08-01
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm font-medium">
+                                        <a href="#" class="text-primary hover:text-secondary">查看详情</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-gray-900">美国加密资产监管框架</div>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <div class="text-sm text-gray-700">美国</div>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <div class="text-sm text-gray-700">金融、科技</div>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <span class="badge badge-warning">中风险</span>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                                        2025-09-15
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm font-medium">
+                                        <a href="#" class="text-primary hover:text-secondary">查看详情</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-gray-900">中国《网络数据安全管理条例》</div>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <div class="text-sm text-gray-700">中国</div>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <div class="text-sm text-gray-700">数据安全</div>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <span class="badge badge-warning">中风险</span>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                                        2025-10-01
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm font-medium">
+                                        <a href="#" class="text-primary hover:text-secondary">查看详情</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-gray-900">英国《金融服务与市场法案》</div>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <div class="text-sm text-gray-700">英国</div>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <div class="text-sm text-gray-700">金融</div>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <span class="badge badge-success">低风险</span>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                                        2025-08-15
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm font-medium">
+                                        <a href="#" class="text-primary hover:text-secondary">查看详情</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-card p-4">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">功能操作</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="text-lg font-medium text-gray-800">订阅提醒</h3>
+                                <span class="text-primary"><i class="fa fa-envelope-o text-xl"></i></span>
+                            </div>
+                            <p class="text-gray-600 text-sm">订阅特定国家/地区或行业的合规政策更新提醒，及时获取重要信息。</p>
+                            <button class="btn-primary w-full mt-3">立即订阅</button>
+                        </div>
+                        
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="text-lg font-medium text-gray-800">数据导出</h3>
+                                <span class="text-primary"><i class="fa fa-download text-xl"></i></span>
+                            </div>
+                            <p class="text-gray-600 text-sm">将筛选后的合规数据导出为Excel或PDF格式，方便离线分析和报告生成。</p>
+                            <button class="btn-primary w-full mt-3">导出数据</button>
+                        </div>
+                        
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="text-lg font-medium text-gray-800">个性化设置</h3>
+                                <span class="text-primary"><i class="fa fa-cog text-xl"></i></span>
+                            </div>
+                            <p class="text-gray-600 text-sm">根据您的业务需求和关注点，自定义合规热点雷达的显示内容和提醒规则。</p>
+                            <button class="btn-primary w-full mt-3">设置偏好</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer class="bg-gray-800 text-white py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">LawFlow AI</h3>
+                    <p class="text-gray-400">LawFlow AI是一个由AI驱动的涉外法务合规智能平台，为企业提供全球合规解决方案。</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">产品服务</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-all">合规雷达</a></li>
+                        <li><a href="#" class="hover:text-white transition-all">法规库</a></li>
+                        <li><a href="#" class="hover:text-white transition-all">智能咨询</a></li>
+                        <li><a href="#" class="hover:text-white transition-all">合规培训</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">关于我们</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-all">公司简介</a></li>
+                        <li><a href="#" class="hover:text-white transition-all">团队介绍</a></li>
+                        <li><a href="#" class="hover:text-white transition-all">新闻动态</a></li>
+                        <li><a href="#" class="hover:text-white transition-all">联系我们</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">联系方式</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><i class="fa fa-envelope-o mr-2"></i> contact@legalflow.ai</li>
+                        <li><i class="fa fa-phone mr-2"></i> +86 10 8888 8888</li>
+                        <li><i class="fa fa-map-marker mr-2"></i> 北京市朝阳区建国门外大街1号</li>
+                    </ul>
+                    <div class="flex space-x-4 mt-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-all"><i class="fa fa-weixin text-xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-all"><i class="fa fa-weibo text-xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-all"><i class="fa fa-linkedin text-xl"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-6 text-center text-gray-400">
+                <p>&copy; 2025 LegalFlow AI. 保留所有权利。</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/radar.js"></script>
+</body>
+</html>

@@ -1,0 +1,973 @@
+<html lang="zh-CN"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>涉外合同审查 - LawFlow AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="./css/contract.css">
+    <script src="./js/contract.js" defer></script>
+</head>
+<body>
+    <!-- 子页面导航栏 -->
+    <nav class="sub-navbar">
+        <div class="container">
+            <div class="sub-nav-container">
+                <div class="sub-nav-logo">
+                    <img src="../shared/assets/icon/logo.png" alt="LawFlow AI Logo" class="sub-logo-img">
+                    <div class="sub-logo-text">
+                        <h2>LawFlow AI</h2>
+                        <span>涉外合同审查系统</span>
+                    </div>
+                </div>
+                
+                <ul class="sub-nav-menu">
+                    <li class="sub-nav-item"><a href="../index.html" class="sub-nav-link"><i class="fas fa-home"></i> 返回主页</a></li>
+                    <li class="sub-nav-item"><a href="#upload-section" class="sub-nav-link"><i class="fas fa-upload"></i> 合同上传</a></li>
+                    <li class="sub-nav-item"><a href="#review-section" class="sub-nav-link"><i class="fas fa-search"></i> 智能审查</a></li>
+                    <li class="sub-nav-item"><a href="#report-section" class="sub-nav-link"><i class="fas fa-file-alt"></i> 报告生成</a></li>
+                </ul>
+                
+                <div class="sub-hamburger">
+                    <span class="sub-bar"></span>
+                    <span class="sub-bar"></span>
+                    <span class="sub-bar"></span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 页面标题区域 -->
+     <!-- 图片轮播 -->
+<div class="hero-carousel">
+  <div class="carousel-slide active"></div>
+  <div class="carousel-slide"></div>
+  <div class="carousel-slide"></div>
+  <div class="carousel-slide"></div>
+  <div class="carousel-slide"></div>
+  
+  <div class="carousel-nav">
+    <button class="carousel-prev">❮</button>
+    <button class="carousel-next">❯</button>
+  </div>
+  
+  <div class="carousel-controls">
+    <span class="carousel-dot active"></span>
+    <span class="carousel-dot"></span>
+    <span class="carousel-dot"></span>
+    <span class="carousel-dot"></span>
+    <span class="carousel-dot"></span>
+  </div>
+</div>
+    <section class="sub-hero">
+        <div class="contract-bg-carousel" id="contractBg">
+            <div class="contract-bg-slide" style="background-image:url('../shared/assets/images/1.png')"></div>
+            <div class="contract-bg-slide" style="background-image:url('../shared/assets/images/2.png')"></div>
+            <div class="contract-bg-slide" style="background-image:url('../shared/assets/images/3.png')"></div>
+        </div>
+        <div class="hero-slideshow">
+            <div class="hero-slide" style="background-image:url('../shared/assets/hero/bg1.jpg');"></div>
+            <div class="hero-slide" style="background-image:url('../shared/assets/hero/bg2.jpg');"></div>
+            <div class="hero-slide" style="background-image:url('../shared/assets/hero/bg3.jpg');"></div>
+            <div class="hero-slide" style="background-image:url('../shared/assets/hero/bg4.jpg');"></div>
+            <div class="hero-slide" style="background-image:url('../shared/assets/hero/bg5.jpg');"></div>
+            <div class="hero-slide" style="background-image:url('../shared/assets/hero/bg6.jpg');"></div>
+        </div>
+        <div class="container">
+            <div class="sub-hero-content">
+                <h1 class="sub-hero-title">涉外合同智能审查系统</h1>
+                <p class="sub-hero-subtitle">上传合同 → AI分析 → 风险评分 → 修改建议 → 优化合同</p>
+                
+                <div class="sub-quick-nav">
+                    <a href="#procurement" class="sub-nav-btn">
+                        <i class="fas fa-shopping-cart"></i> 采购合同
+                    </a>
+                    <a href="#tax" class="sub-nav-btn">
+                        <i class="fas fa-receipt"></i> 税务合同
+                    </a>
+                    <a href="#trade" class="sub-nav-btn">
+                        <i class="fas fa-handshake"></i> 贸易合同
+                    </a>
+                    <a href="#labor" class="sub-nav-btn">
+                        <i class="fas fa-user-tie"></i> 劳务合同
+                    </a>
+                </div>
+
+                <div class="sub-hero-highlights">
+                    <div class="highlight-card">
+                        <h4><i class="fas fa-layer-group"></i> 分层风险洞察</h4>
+                        <p>多维度拆解核心条款并给出结构化建议</p>
+                    </div>
+                    <div class="highlight-card">
+                        <h4><i class="fas fa-shield-alt"></i> 合规策略内置</h4>
+                        <p>内嵌最新国际贸易与税务合规基线</p>
+                    </div>
+                    <div class="highlight-card">
+                        <h4><i class="fas fa-wand-magic-sparkles"></i> 智能自动修正</h4>
+                        <p>一键生成可落地的优化条款版本</p>
+                    </div>
+                    <div class="highlight-card">
+                        <h4><i class="fas fa-globe"></i> 多法域适配</h4>
+                        <p>跨国家场景快速切换法律适用框架</p>
+                    </div>
+                    <div class="highlight-card">
+                        <h4><i class="fas fa-database"></i> 数据合规监测</h4>
+                        <p>动态标记隐私与跨境数据风险项</p>
+                    </div>
+                    <div class="highlight-card">
+                        <h4><i class="fas fa-bell"></i> 法规更新推送</h4>
+                        <p>实时同步重点法域最新监管变动</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 合同上传区域 -->
+    <section id="upload-section" class="sub-section">
+        <div class="container">
+            <h2 class="sub-section-title"><i class="fas fa-cloud-upload-alt"></i> 合同上传</h2>
+            
+            <div class="sub-upload-area">
+                <div class="sub-upload-container">
+                    <div class="sub-upload-icon">
+                        <i class="fas fa-file-contract"></i>
+                    </div>
+                    <h3>拖放合同文件到此处</h3>
+                    <p>支持PDF、Word格式，最大100MB</p>
+                    <button class="sub-upload-btn">选择文件</button>
+                    <input type="file" id="contract-upload" accept=".pdf,.doc,.docx" style="display: none;">
+                </div>
+                
+                <div class="sub-upload-details">
+                    <div class="sub-detail-card">
+                        <h4><i class="fas fa-clock"></i> 快速审查</h4>
+                        <p>标准合同可在10秒内完成初步风险评估</p>
+                    </div>
+                    <div class="sub-detail-card">
+                        <h4><i class="fas fa-globe"></i> 多语言支持</h4>
+                        <p>支持中、英、日、德、法等12种语言合同</p>
+                    </div>
+                    <div class="sub-detail-card">
+                        <h4><i class="fas fa-shield-alt"></i> 安全加密</h4>
+                        <p>所有文件传输均采用银行级加密保护</p>
+                    </div>
+                    <div class="sub-detail-card">
+                        <h4><i class="fas fa-database"></i> 云端存储</h4>
+                        <p>合同文件安全存储，支持随时查阅和管理</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 合同审查功能区 -->
+    <section id="review-section" class="sub-section sub-alt-bg">
+        <div class="container">
+            <h2 class="sub-section-title"><i class="fas fa-search"></i> 智能审查</h2>
+            
+            <div class="sub-tabs">
+                <div class="sub-tab-nav">
+                    <button class="sub-tab-btn active" data-tab="procurement">采购合同</button>
+                    <button class="sub-tab-btn" data-tab="tax">税务合同</button>
+                    <button class="sub-tab-btn" data-tab="trade">贸易合同</button>
+                    <button class="sub-tab-btn" data-tab="labor">劳务合同</button>
+                </div>
+                
+                <div class="sub-tab-content">
+                    <!-- 采购合同审查 -->
+                    <div id="procurement" class="sub-tab-pane active">
+                        <div class="sub-review-container">
+                            <div class="sub-review-sidebar">
+                                <h4>审查重点</h4>
+                                <ul class="sub-review-list">
+                                    <li class="active" data-target="delivery">交付条款</li>
+                                    <li data-target="payment">付款条件</li>
+                                    <li data-target="warranty">质量保证</li>
+                                    <li data-target="liability">责任限制</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="sub-review-main">
+                                <div id="delivery" class="sub-review-detail active">
+                                    <h3>交付条款审查</h3>
+                                    <div class="sub-risk-meter">
+                                        <div class="sub-risk-scale">
+                                            <span class="low">低风险</span>
+                                            <span class="medium">中风险</span>
+                                            <span class="high">高风险</span>
+                                        </div>
+                                        <div class="sub-risk-indicator" style="left: 30%;"></div>
+                                    </div>
+                                    
+                                    <div class="sub-risk-findings">
+                                        <div class="sub-finding critical">
+                                            <h5><i class="fas fa-exclamation-circle"></i> 关键问题</h5>
+                                            <p>合同中未明确约定延迟交付的违约金计算方式，仅提及"违约方应承担相应责任"，缺乏具体执行标准。</p>
+                                        </div>
+                                        <div class="sub-finding warning">
+                                            <h5><i class="fas fa-exclamation-triangle"></i> 潜在风险</h5>
+                                            <p>交付地点描述不够具体，仅注明"买方指定港口"，未明确具体港口名称和具体卸货位置，可能引发争议。</p>
+                                        </div>
+                                        <div class="sub-finding warning">
+                                            <h5><i class="fas fa-exclamation-triangle"></i> 潜在风险</h5>
+                                            <p>未明确货物验收的具体标准和流程，可能导致双方对货物是否符合交付条件产生分歧。</p>
+                                        </div>
+                                        <div class="sub-finding suggestion">
+                                            <h5><i class="fas fa-lightbulb"></i> 优化建议</h5>
+                                            <p>建议添加明确的交付时间表和违约金条款，交付地点应具体到门牌号或港口具体位置。可参考国际贸易术语解释通则2020中的相关条款。</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="sub-actions">
+                                        <button class="sub-action-btn primary"><i class="fas fa-magic"></i> 自动修正</button>
+                                        <button class="sub-action-btn"><i class="fas fa-comment-alt"></i> 添加备注</button>
+                                        <button class="sub-action-btn"><i class="fas fa-history"></i> 查看案例</button>
+                                    </div>
+                                </div>
+                                
+                                <div id="payment" class="sub-review-detail">
+                                    <h3>付款条件审查</h3>
+                                    <div class="sub-risk-meter">
+                                        <div class="sub-risk-scale">
+                                            <span class="low">低风险</span>
+                                            <span class="medium">中风险</span>
+                                            <span class="high">高风险</span>
+                                        </div>
+                                        <div class="sub-risk-indicator" style="left: 50%;"></div>
+                                    </div>
+                                    
+                                    <div class="sub-risk-findings">
+                                        <div class="sub-finding critical">
+                                            <h5><i class="fas fa-exclamation-circle"></i> 关键问题</h5>
+                                            <p>合同未明确约定付款延迟的违约责任，可能导致买方拖欠款项时缺乏有效的法律约束。</p>
+                                        </div>
+                                        <div class="sub-finding warning">
+                                            <h5><i class="fas fa-exclamation-triangle"></i> 潜在风险</h5>
+                                            <p>付款方式仅注明"电汇"，未明确具体银行账户信息和付款时间节点，可能导致付款延误。</p>
+                                        </div>
+                                        <div class="sub-finding warning">
+                                            <h5><i class="fas fa-exclamation-triangle"></i> 潜在风险</h5>
+                                            <p>未明确汇率波动的风险承担方，在国际采购合同中可能导致额外成本争议。</p>
+                                        </div>
+                                        <div class="sub-finding suggestion">
+                                            <h5><i class="fas fa-lightbulb"></i> 优化建议</h5>
+                                            <p>建议明确约定付款的时间节点、银行账户信息、汇率风险承担方以及延迟付款的违约金计算方式（建议按日0.05%计算，不超过合同总额的5%）。</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="sub-actions">
+                                        <button class="sub-action-btn primary"><i class="fas fa-magic"></i> 自动修正</button>
+                                        <button class="sub-action-btn"><i class="fas fa-comment-alt"></i> 添加备注</button>
+                                        <button class="sub-action-btn"><i class="fas fa-history"></i> 查看案例</button>
+                                    </div>
+                                </div>
+                                
+                                <div id="warranty" class="sub-review-detail">
+                                    <h3>质量保证审查</h3>
+                                    <div class="sub-risk-meter">
+                                        <div class="sub-risk-scale">
+                                            <span class="low">低风险</span>
+                                            <span class="medium">中风险</span>
+                                            <span class="high">高风险</span>
+                                        </div>
+                                        <div class="sub-risk-indicator" style="left: 20%;"></div>
+                                    </div>
+                                    
+                                    <div class="sub-risk-findings">
+                                        <div class="sub-finding warning">
+                                            <h5><i class="fas fa-exclamation-triangle"></i> 潜在风险</h5>
+                                            <p>质量保证期仅为30天，短于行业平均的90天标准，可能无法充分发现产品潜在问题。</p>
+                                        </div>
+                                        <div class="sub-finding warning">
+                                            <h5><i class="fas fa-exclamation-triangle"></i> 潜在风险</h5>
+                                            <p>未明确约定质量不合格时的补救措施和费用承担方，可能导致争议。</p>
+                                        </div>
+                                        <div class="sub-finding suggestion">
+                                            <h5><i class="fas fa-lightbulb"></i> 优化建议</h5>
+                                            <p>建议将质量保证期延长至90天，并明确约定质量不合格时的退换货流程、费用承担方及赔偿标准。同时建议明确质量检验的第三方机构选择。</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="sub-actions">
+                                        <button class="sub-action-btn primary"><i class="fas fa-magic"></i> 自动修正</button>
+                                        <button class="sub-action-btn"><i class="fas fa-comment-alt"></i> 添加备注</button>
+                                        <button class="sub-action-btn"><i class="fas fa-history"></i> 查看案例</button>
+                                    </div>
+                                </div>
+                                
+                                <div id="liability" class="sub-review-detail">
+                                    <h3>责任限制审查</h3>
+                                    <div class="sub-risk-meter">
+                                        <div class="sub-risk-scale">
+                                            <span class="low">低风险</span>
+                                            <span class="medium">中风险</span>
+                                            <span class="high">高风险</span>
+                                        </div>
+                                        <div class="sub-risk-indicator" style="left: 70%;"></div>
+                                    </div>
+                                    
+                                    <div class="sub-risk-findings">
+                                        <div class="sub-finding critical">
+                                            <h5><i class="fas fa-exclamation-circle"></i> 关键问题</h5>
+                                            <p>卖方责任限制条款过于宽泛，试图免除因自身重大过失导致的损失赔偿责任，可能因违反法律强制性规定而无效。</p>
+                                        </div>
+                                        <div class="sub-finding critical">
+                                            <h5><i class="fas fa-exclamation-circle"></i> 关键问题</h5>
+                                            <p>未明确约定间接损失的赔偿范围，可能导致争议。</p>
+                                        </div>
+                                        <div class="sub-finding warning">
+                                            <h5><i class="fas fa-exclamation-triangle"></i> 潜在风险</h5>
+                                            <p>责任限额设定过低（仅为合同金额的10%），与行业惯例不符。</p>
+                                        </div>
+                                        <div class="sub-finding suggestion">
+                                            <h5><i class="fas fa-lightbulb"></i> 优化建议</h5>
+                                            <p>建议修改责任限制条款，明确排除因故意或重大过失导致的损失赔偿限制，并将责任限额提高至合同金额的30%-50%。同时明确间接损失的定义和赔偿范围。</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="sub-actions">
+                                        <button class="sub-action-btn primary"><i class="fas fa-magic"></i> 自动修正</button>
+                                        <button class="sub-action-btn"><i class="fas fa-comment-alt"></i> 添加备注</button>
+                                        <button class="sub-action-btn"><i class="fas fa-history"></i> 查看案例</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 税务合同审查 -->
+                    <div id="tax" class="sub-tab-pane">
+                        <div class="sub-review-container">
+                            <div class="sub-review-sidebar">
+                                <h4>审查重点</h4>
+                                <ul class="sub-review-list">
+                                    <li class="active" data-target="tax-liability">税费承担</li>
+                                    <li data-target="tax-rate">税率适用</li>
+                                    <li data-target="tax-filing">税务申报</li>
+                                    <li data-target="tax-audit">税务稽查</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="sub-review-main">
+                                <div id="tax-liability" class="sub-review-detail active">
+                                    <h3>税费承担条款审查</h3>
+                                    <div class="sub-risk-meter">
+                                        <div class="sub-risk-scale">
+                                            <span class="low">低风险</span>
+                                            <span class="medium">中风险</span>
+                                            <span class="high">高风险</span>
+                                        </div>
+                                        <div class="sub-risk-indicator" style="left: 40%;"></div>
+                                    </div>
+                                    
+                                    <div class="sub-risk-findings">
+                                        <div class="sub-finding critical">
+                                            <h5><i class="fas fa-exclamation-circle"></i> 关键问题</h5>
+                                            <p>合同未明确跨境交易中的预提所得税承担方，可能导致税务纠纷。</p>
+                                        </div>
+                                        <div class="sub-finding warning">
+                                            <h5><i class="fas fa-exclamation-triangle"></i> 潜在风险</h5>
+                                            <p>未考虑税收协定对税种和税率的影响，可能导致多缴税款。</p>
+                                        </div>
+                                        <div class="sub-finding suggestion">
+                                            <h5><i class="fas fa-lightbulb"></i> 优化建议</h5>
+                                            <p>建议明确划分各方应承担的税种（包括但不限于增值税、企业所得税、印花税等），并约定税收优惠的归属原则。同时建议提及适用的双边税收协定条款。</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="sub-actions">
+                                        <button class="sub-action-btn primary"><i class="fas fa-magic"></i> 自动修正</button>
+                                        <button class="sub-action-btn"><i class="fas fa-comment-alt"></i> 添加备注</button>
+                                        <button class="sub-action-btn"><i class="fas fa-history"></i> 查看案例</button>
+                                    </div>
+                                </div>
+                                
+                                <div id="tax-rate" class="sub-review-detail">
+                                    <h3>税率适用条款审查</h3>
+                                    <div class="sub-risk-meter">
+                                        <div class="sub-risk-scale">
+                                            <span class="low">低风险</span>
+                                            <span class="medium">中风险</span>
+                                            <span class="high">高风险</span>
+                                        </div>
+                                        <div class="sub-risk-indicator" style="left: 30%;"></div>
+                                    </div>
+                                    
+                                    <div class="sub-risk-findings">
+                                        <div class="sub-finding warning">
+                                            <h5><i class="fas fa-exclamation-triangle"></i> 潜在风险</h5>
+                                            <p>合同中约定的增值税率为13%，但未考虑服务发生地的税率差异和可能的税率调整。</p>
+                                        </div>
+                                        <div class="sub-finding suggestion">
+                                            <h5><i class="fas fa-lightbulb"></i> 优化建议</h5>
+                                            <p>建议根据服务提供地和接收地的不同，分别约定适用税率，并加入"如遇税法调整，按最新规定执行"的弹性条款。</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="sub-actions">
+                                        <button class="sub-action-btn primary"><i class="fas fa-magic"></i> 自动修正</button>
+                                        <button class="sub-action-btn"><i class="fas fa-comment-alt"></i> 添加备注</button>
+                                        <button class="sub-action-btn"><i class="fas fa-history"></i> 查看案例</button>
+                                    </div>
+                                </div>
+                                
+                                <div id="tax-filing" class="sub-review-detail">
+                                    <h3>税务申报条款审查</h3>
+                                    <div class="sub-risk-meter">
+                                        <div class="sub-risk-scale">
+                                            <span class="low">低风险</span>
+                                            <span class="medium">中风险</span>
+                                            <span class="high">高风险</span>
+                                        </div>
+                                        <div class="sub-risk-indicator" style="left: 50%;"></div>
+                                    </div>
+                                    
+                                    <div class="sub-risk-findings">
+                                        <div class="sub-finding critical">
+                                            <h5><i class="fas fa-exclamation-circle"></i> 关键问题</h5>
+                                            <p>未明确税务申报的责任方和时限要求，可能导致逾期申报和罚款。</p>
+                                        </div>
+                                        <div class="sub-finding warning">
+                                            <h5><i class="fas fa-exclamation-triangle"></i> 潜在风险</h5>
+                                            <p>未约定税务文件的提供责任和标准，可能影响申报准确性。</p>
+                                        </div>
+                                        <div class="sub-finding suggestion">
+                                            <h5><i class="fas fa-lightbulb"></i> 优化建议</h5>
+                                            <p>建议明确各方在税务申报中的责任分工、时限要求和文件提供义务，并约定因未按时申报导致的罚款承担方。</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="sub-actions">
+                                        <button class="sub-action-btn primary"><i class="fas fa-magic"></i> 自动修正</button>
+                                        <button class="sub-action-btn"><i class="fas fa-comment-alt"></i> 添加备注</button>
+                                        <button class="sub-action-btn"><i class="fas fa-history"></i> 查看案例</button>
+                                    </div>
+                                </div>
+                                
+                                <div id="tax-audit" class="sub-review-detail">
+                                    <h3>税务稽查条款审查</h3>
+                                    <div class="sub-risk-meter">
+                                        <div class="sub-risk-scale">
+                                            <span class="low">低风险</span>
+                                            <span class="medium">中风险</span>
+                                            <span class="high">高风险</span>
+                                        </div>
+                                        <div class="sub-risk-indicator" style="left: 60%;"></div>
+                                    </div>
+                                    
+                                    <div class="sub-risk-findings">
+                                        <div class="sub-finding critical">
+                                            <h5><i class="fas fa-exclamation-circle"></i> 关键问题</h5>
+                                            <p>合同未包含税务稽查应对条款，可能导致税务机关稽查时双方配合不畅。</p>
+                                        </div>
+                                        <div class="sub-finding critical">
+                                            <h5><i class="fas fa-exclamation-circle"></i> 关键问题</h5>
+                                            <p>未约定税务违规导致的罚款和滞纳金承担方，存在潜在财务风险。</p>
+                                        </div>
+                                        <div class="sub-finding suggestion">
+                                            <h5><i class="fas fa-lightbulb"></i> 优化建议</h5>
+                                            <p>建议添加税务稽查应对条款，明确双方在税务稽查中的配合义务、信息提供责任，并根据违规原因约定罚款和滞纳金的承担方。</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="sub-actions">
+                                        <button class="sub-action-btn primary"><i class="fas fa-magic"></i> 自动修正</button>
+                                        <button class="sub-action-btn"><i class="fas fa-comment-alt"></i> 添加备注</button>
+                                        <button class="sub-action-btn"><i class="fas fa-history"></i> 查看案例</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 贸易合同审查 -->
+                    <div id="trade" class="sub-tab-pane">
+                        <div class="sub-review-container">
+                            <div class="sub-review-sidebar">
+                                <h4>审查重点</h4>
+                                <ul class="sub-review-list">
+                                    <li class="active" data-target="incoterms">贸易术语</li>
+                                    <li data-target="transport">运输条款</li>
+                                    <li data-target="insurance">保险条款</li>
+                                    <li data-target="dispute">争议解决</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="sub-review-main">
+                                <div id="incoterms" class="sub-review-detail active">
+                                    <h3>贸易术语条款审查</h3>
+                                    <div class="sub-risk-meter">
+                                        <div class="sub-risk-scale">
+                                            <span class="low">低风险</span>
+                                            <span class="medium">中风险</span>
+                                            <span class="high">高风险</span>
+                                        </div>
+                                        <div class="sub-risk-indicator" style="left: 25%;"></div>
+                                    </div>
+                                    
+                                    <div class="sub-risk-findings">
+                                        <div class="sub-finding warning">
+                                            <h5><i class="fas fa-exclamation-triangle"></i> 潜在风险</h5>
+                                            <p>合同使用FOB术语但未注明适用的INCOTERMS版本，可能导致理解分歧。</p>
+                                        </div>
+                                        <div class="sub-finding warning">
+                                            <h5><i class="fas fa-exclamation-triangle"></i> 潜在风险</h5>
+                                            <p>未明确FOB术语下货物风险转移的具体时点和责任划分。</p>
+                                        </div>
+                                        <div class="sub-finding suggestion">
+                                            <h5><i class="fas fa-lightbulb"></i> 优化建议</h5>
+                                            <p>建议明确标注适用"INCOTERMS 2020"，并详细说明FOB术语下双方在货物运输、保险、进出口手续等方面的责任划分。</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="sub-actions">
+                                        <button class="sub-action-btn primary"><i class="fas fa-magic"></i> 自动修正</button>
+                                        <button class="sub-action-btn"><i class="fas fa-comment-alt"></i> 添加备注</button>
+                                        <button class="sub-action-btn"><i class="fas fa-history"></i> 查看案例</button>
+                                    </div>
+                                </div>
+                                
+                                <div id="transport" class="sub-review-detail">
+                                    <h3>运输条款审查</h3>
+                                    <div class="sub-risk-meter">
+                                        <div class="sub-risk-scale">
+                                            <span class="low">低风险</span>
+                                            <span class="medium">中风险</span>
+                                            <span class="high">高风险</span>
+                                        </div>
+                                        <div class="sub-risk-indicator" style="left: 40%;"></div>
+                                    </div>
+                                    
+                                    <div class="sub-risk-findings">
+                                        <div class="sub-finding critical">
+                                            <h5><i class="fas fa-exclamation-circle"></i> 关键问题</h5>
+                                            <p>未明确运输方式和运输责任方，可能导致运输安排混乱。</p>
+                                        </div>
+                                        <div class="sub-finding warning">
+                                            <h5><i class="fas fa-exclamation-triangle"></i> 潜在风险</h5>
+                                            <p>未约定货物运输延误的处理方式和责任承担。</p>
+                                        </div>
+                                        <div class="sub-finding suggestion">
+                                            <h5><i class="fas fa-lightbulb"></i> 优化建议</h5>
+                                            <p>建议明确运输方式（海运/空运/陆运）、运输责任方、运输时间要求及延误处理机制，并约定运输过程中货物损坏的赔偿标准。</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="sub-actions">
+                                        <button class="sub-action-btn primary"><i class="fas fa-magic"></i> 自动修正</button>
+                                        <button class="sub-action-btn"><i class="fas fa-comment-alt"></i> 添加备注</button>
+                                        <button class="sub-action-btn"><i class="fas fa-history"></i> 查看案例</button>
+                                    </div>
+                                </div>
+                                
+                                <div id="insurance" class="sub-review-detail">
+                                    <h3>保险条款审查</h3>
+                                    <div class="sub-risk-meter">
+                                        <div class="sub-risk-scale">
+                                            <span class="low">低风险</span>
+                                            <span class="medium">中风险</span>
+                                            <span class="high">高风险</span>
+                                        </div>
+                                        <div class="sub-risk-indicator" style="left: 60%;"></div>
+                                    </div>
+                                    
+                                    <div class="sub-risk-findings">
+                                        <div class="sub-finding critical">
+                                            <h5><i class="fas fa-exclamation-circle"></i> 关键问题</h5>
+                                            <p>合同未约定货物运输保险的投保责任方和保险金额，存在重大风险隐患。</p>
+                                        </div>
+                                        <div class="sub-finding critical">
+                                            <h5><i class="fas fa-exclamation-circle"></i> 关键问题</h5>
+                                            <p>未明确保险覆盖的风险类型，可能导致货损时无法获得充分赔偿。</p>
+                                        </div>
+                                        <div class="sub-finding suggestion">
+                                            <h5><i class="fas fa-lightbulb"></i> 优化建议</h5>
+                                            <p>建议明确保险责任方，投保一切险（All Risks），保险金额应为货物价值的110%，并约定保险索赔的处理流程和收益归属。</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="sub-actions">
+                                        <button class="sub-action-btn primary"><i class="fas fa-magic"></i> 自动修正</button>
+                                        <button class="sub-action-btn"><i class="fas fa-comment-alt"></i> 添加备注</button>
+                                        <button class="sub-action-btn"><i class="fas fa-history"></i> 查看案例</button>
+                                    </div>
+                                </div>
+                                
+                                <div id="dispute" class="sub-review-detail">
+                                    <h3>争议解决条款审查</h3>
+                                    <div class="sub-risk-meter">
+                                        <div class="sub-risk-scale">
+                                            <span class="low">低风险</span>
+                                            <span class="medium">中风险</span>
+                                            <span class="high">高风险</span>
+                                        </div>
+                                        <div class="sub-risk-indicator" style="left: 30%;"></div>
+                                    </div>
+                                    
+                                    <div class="sub-risk-findings">
+                                        <div class="sub-finding warning">
+                                            <h5><i class="fas fa-exclamation-triangle"></i> 潜在风险</h5>
+                                            <p>约定了诉讼和仲裁两种争议解决方式，可能导致冲突和执行困难。</p>
+                                        </div>
+                                        <div class="sub-finding warning">
+                                            <h5><i class="fas fa-exclamation-triangle"></i> 潜在风险</h5>
+                                            <p>未明确适用法律，可能影响争议解决结果。</p>
+                                        </div>
+                                        <div class="sub-finding suggestion">
+                                            <h5><i class="fas fa-lightbulb"></i> 优化建议</h5>
+                                            <p>建议选择单一争议解决方式（优先推荐仲裁），明确仲裁机构（如CIETAC或ICC）、仲裁地和适用法律（建议选择与合同关系最密切的法律体系）。</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="sub-actions">
+                                        <button class="sub-action-btn primary"><i class="fas fa-magic"></i> 自动修正</button>
+                                        <button class="sub-action-btn"><i class="fas fa-comment-alt"></i> 添加备注</button>
+                                        <button class="sub-action-btn"><i class="fas fa-history"></i> 查看案例</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 劳务合同审查 -->
+                    <div id="labor" class="sub-tab-pane">
+                        <div class="sub-review-container">
+                            <div class="sub-review-sidebar">
+                                <h4>审查重点</h4>
+                                <ul class="sub-review-list">
+                                    <li class="active" data-target="employment-term">雇佣期限</li>
+                                    <li data-target="remuneration">薪酬福利</li>
+                                    <li data-target="confidentiality">保密条款</li>
+                                    <li data-target="termination">合同解除</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="sub-review-main">
+                                <div id="employment-term" class="sub-review-detail active">
+                                    <h3>雇佣期限条款审查</h3>
+                                    <div class="sub-risk-meter">
+                                        <div class="sub-risk-scale">
+                                            <span class="low">低风险</span>
+                                            <span class="medium">中风险</span>
+                                            <span class="high">高风险</span>
+                                        </div>
+                                        <div class="sub-risk-indicator" style="left: 20%;"></div>
+                                    </div>
+                                    
+                                    <div class="sub-risk-findings">
+                                        <div class="sub-finding warning">
+                                            <h5><i class="fas fa-exclamation-triangle"></i> 潜在风险</h5>
+                                            <p>未明确试用期期限和试用期工资标准，可能违反当地劳动法规。</p>
+                                        </div>
+                                        <div class="sub-finding suggestion">
+                                            <h5><i class="fas fa-lightbulb"></i> 优化建议</h5>
+                                            <p>建议明确合同期限、试用期（不超过6个月）及试用期工资（不低于正式工资的80%），并符合工作所在地的劳动法律要求。</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="sub-actions">
+                                        <button class="sub-action-btn primary"><i class="fas fa-magic"></i> 自动修正</button>
+                                        <button class="sub-action-btn"><i class="fas fa-comment-alt"></i> 添加备注</button>
+                                        <button class="sub-action-btn"><i class="fas fa-history"></i> 查看案例</button>
+                                    </div>
+                                </div>
+                                
+                                <div id="remuneration" class="sub-review-detail">
+                                    <h3>薪酬福利条款审查</h3>
+                                    <div class="sub-risk-meter">
+                                        <div class="sub-risk-scale">
+                                            <span class="low">低风险</span>
+                                            <span class="medium">中风险</span>
+                                            <span class="high">高风险</span>
+                                        </div>
+                                        <div class="sub-risk-indicator" style="left: 45%;"></div>
+                                    </div>
+                                    
+                                    <div class="sub-risk-findings">
+                                        <div class="sub-finding critical">
+                                            <h5><i class="fas fa-exclamation-circle"></i> 关键问题</h5>
+                                            <p>未明确工资支付货币种类和汇率适用标准，在跨境劳务中可能导致纠纷。</p>
+                                        </div>
+                                        <div class="sub-finding warning">
+                                            <h5><i class="fas fa-exclamation-triangle"></i> 潜在风险</h5>
+                                            <p>未详细列明福利待遇构成和计算方式，可能引发争议。</p>
+                                        </div>
+                                        <div class="sub-finding suggestion">
+                                            <h5><i class="fas fa-lightbulb"></i> 优化建议</h5>
+                                            <p>建议明确工资支付货币、支付日期、汇率适用标准（如采用付款当日央行中间价），并详细列明各项福利（包括但不限于社保、公积金、年假等）的具体内容。</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="sub-actions">
+                                        <button class="sub-action-btn primary"><i class="fas fa-magic"></i> 自动修正</button>
+                                        <button class="sub-action-btn"><i class="fas fa-comment-alt"></i> 添加备注</button>
+                                        <button class="sub-action-btn"><i class="fas fa-history"></i> 查看案例</button>
+                                    </div>
+                                </div>
+                                
+                                <div id="confidentiality" class="sub-review-detail">
+                                    <h3>保密条款审查</h3>
+                                    <div class="sub-risk-meter">
+                                        <div class="sub-risk-scale">
+                                            <span class="low">低风险</span>
+                                            <span class="medium">中风险</span>
+                                            <span class="high">高风险</span>
+                                        </div>
+                                        <div class="sub-risk-indicator" style="left: 60%;"></div>
+                                    </div>
+                                    
+                                    <div class="sub-risk-findings">
+                                        <div class="sub-finding critical">
+                                            <h5><i class="fas fa-exclamation-circle"></i> 关键问题</h5>
+                                            <p>保密条款过于笼统，未明确保密信息的范围和保密期限。</p>
+                                        </div>
+                                        <div class="sub-finding critical">
+                                            <h5><i class="fas fa-exclamation-circle"></i> 关键问题</h5>
+                                            <p>未约定违反保密义务的违约责任，缺乏约束力。</p>
+                                        </div>
+                                        <div class="sub-finding suggestion">
+                                            <h5><i class="fas fa-lightbulb"></i> 优化建议</h5>
+                                            <p>建议明确界定保密信息的具体范围，约定合同终止后至少3年的保密期，并设定明确的违约赔偿计算方式（建议为造成损失的1.5倍或固定金额）。</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="sub-actions">
+                                        <button class="sub-action-btn primary"><i class="fas fa-magic"></i> 自动修正</button>
+                                        <button class="sub-action-btn"><i class="fas fa-comment-alt"></i> 添加备注</button>
+                                        <button class="sub-action-btn"><i class="fas fa-history"></i> 查看案例</button>
+                                    </div>
+                                </div>
+                                
+                                <div id="termination" class="sub-review-detail">
+                                    <h3>合同解除条款审查</h3>
+                                    <div class="sub-risk-meter">
+                                        <div class="sub-risk-scale">
+                                            <span class="low">低风险</span>
+                                            <span class="medium">中风险</span>
+                                            <span class="high">高风险</span>
+                                        </div>
+                                        <div class="sub-risk-indicator" style="left: 35%;"></div>
+                                    </div>
+                                    
+                                    <div class="sub-risk-findings">
+                                        <div class="sub-finding warning">
+                                            <h5><i class="fas fa-exclamation-triangle"></i> 潜在风险</h5>
+                                            <p>未明确合同解除的通知期限和经济补偿标准，可能违反劳动法规。</p>
+                                        </div>
+                                        <div class="sub-finding warning">
+                                            <h5><i class="fas fa-exclamation-triangle"></i> 潜在风险</h5>
+                                            <p>未约定合同终止后的竞业限制条款，可能导致核心人才流失风险。</p>
+                                        </div>
+                                        <div class="sub-finding suggestion">
+                                            <h5><i class="fas fa-lightbulb"></i> 优化建议</h5>
+                                            <p>建议明确双方解除合同的条件、通知期限和经济补偿标准（符合当地劳动法规要求），对核心岗位可添加合理的竞业限制条款（不超过2年）并约定相应补偿。</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="sub-actions">
+                                        <button class="sub-action-btn primary"><i class="fas fa-magic"></i> 自动修正</button>
+                                        <button class="sub-action-btn"><i class="fas fa-comment-alt"></i> 添加备注</button>
+                                        <button class="sub-action-btn"><i class="fas fa-history"></i> 查看案例</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 报告生成区域 -->
+    <section id="report-section" class="sub-section">
+        <div class="container">
+            <h2 class="sub-section-title"><i class="fas fa-file-alt"></i> 报告生成</h2>
+            
+            <div class="sub-report-container">
+                <div class="sub-report-preview">
+                    <div class="sub-report-header">
+                        <h3>合同风险评估报告</h3>
+                        <p>生成时间: <span id="report-date">2025-10-28 14:30</span></p>
+                    </div>
+                    
+                    <div class="sub-report-summary">
+                        <div class="sub-score-card">
+                            <div class="sub-score-value high">72</div>
+                            <div class="sub-score-label">风险指数</div>
+                        </div>
+                        
+                        <div class="sub-summary-content">
+                            <h4>审查概览</h4>
+                            <p>本次审查发现3个关键风险点，8个需要注意的问题，整体风险等级为<strong>较高</strong>。</p>
+                            
+                            <div class="sub-summary-stats">
+                                <div class="sub-stat">
+                                    <div class="sub-stat-value critical">3</div>
+                                    <div class="sub-stat-label">关键问题</div>
+                                </div>
+                                <div class="sub-stat">
+                                    <div class="sub-stat-value warning">8</div>
+                                    <div class="sub-stat-label">潜在风险</div>
+                                </div>
+                                <div class="sub-stat">
+                                    <div class="sub-stat-value suggestion">12</div>
+                                    <div class="sub-stat-label">优化建议</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sub-report-details">
+                        <h4>详细风险分析</h4>
+                        <div class="sub-detail-item">
+                            <div class="sub-detail-severity critical">高</div>
+                            <div class="sub-detail-content">
+                                <h5>责任限制条款过于宽泛</h5>
+                                <p>第7.3条中的责任限制条款可能使贵方承担不合理的赔偿责任，建议明确限定赔偿范围和上限。</p>
+                            </div>
+                        </div>
+                        <div class="sub-detail-item">
+                            <div class="sub-detail-severity high">高</div>
+                            <div class="sub-detail-content">
+                                <h5>未明确约定违约金计算方式</h5>
+                                <p>合同中多处提及违约赔偿，但未明确具体计算方式，可能导致争议。建议补充按日计算的违约金条款。</p>
+                            </div>
+                        </div>
+                        <div class="sub-detail-item">
+                            <div class="sub-detail-severity medium">中</div>
+                            <div class="sub-detail-content">
+                                <h5>争议解决方式不明确</h5>
+                                <p>合同同时约定了诉讼和仲裁两种方式，可能导致执行困难。建议选择单一方式并明确管辖机构。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="sub-report-actions">
+                    <button class="sub-report-btn primary"><i class="fas fa-download"></i> 下载PDF报告</button>
+                    <button class="sub-report-btn"><i class="fas fa-file-word"></i> 导出Word版本</button>
+                    <button class="sub-report-btn"><i class="fas fa-redo"></i> 重新生成报告</button>
+                    <button class="sub-report-btn"><i class="fas fa-envelope"></i> 发送至邮箱</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI学习审查区域 -->
+    <section class="sub-section sub-alt-bg">
+        <div class="container">
+            <h2 class="sub-section-title"><i class="fas fa-robot"></i> AI学习审查</h2>
+            
+            <div class="sub-ai-container">
+                <div class="sub-ai-intro">
+                    <h3>上传您的合同案例训练专属AI</h3>
+                    <p>通过上传历史合同案例，我们的AI系统可以学习您的业务模式和合同特点，为您提供更精准的审查服务。</p>
+                    
+                    <div class="sub-ai-features">
+                        <div class="sub-feature">
+                            <i class="fas fa-bolt"></i>
+                            <h4>快速学习</h4>
+                            <p>只需5-10份合同即可建立初步模型</p>
+                        </div>
+                        <div class="sub-feature">
+                            <i class="fas fa-lock"></i>
+                            <h4>专属模型</h4>
+                            <p>您训练的模型仅您可见和使用</p>
+                        </div>
+                        <div class="sub-feature">
+                            <i class="fas fa-chart-line"></i>
+                            <h4>持续优化</h4>
+                            <p>使用越多，模型越精准</p>
+                        </div>
+                        <div class="sub-feature">
+                            <i class="fas fa-balance-scale"></i>
+                            <h4>合规适配</h4>
+                            <p>自动适配不同国家和地区的法律法规</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="sub-ai-upload">
+                    <div class="sub-ai-upload-box">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h4>拖放合同文件到此处</h4>
+                        <p>支持PDF、Word格式，建议一次上传5份以上同类型合同</p>
+                        <button class="sub-ai-upload-btn">选择文件</button>
+                    </div>
+                    
+                    <div class="sub-ai-progress">
+                        <h4>模型训练进度</h4>
+                        <div class="sub-progress-bar">
+                            <div class="sub-progress-fill" style="width: 65%;"></div>
+                        </div>
+                        <p>已学习: 65% - 预计剩余时间: 12分钟</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="sub-footer">
+        <div class="container">
+            <div class="sub-footer-content">
+                <div class="sub-footer-section">
+                    <img src="../shared/assets/icon/logo.png" alt="LawFlow AI Logo" class="sub-footer-logo">
+                    <p>AI驱动的涉外法务合规审查平台</p>
+                    <div class="sub-social-links">
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-weixin"></i></a>
+                    </div>
+                </div>
+                
+                <div class="sub-footer-section">
+                    <h4>产品</h4>
+                    <ul>
+                        <li><a href="#">智能合规问答</a></li>
+                        <li><a href="#">合同审查系统</a></li>
+                        <li><a href="#">合规热点雷达</a></li>
+                        <li><a href="#">交流社区</a></li>
+                    </ul>
+                </div>
+                
+                <div class="sub-footer-section">
+                    <h4>资源</h4>
+                    <ul>
+                        <li><a href="#">帮助中心</a></li>
+                        <li><a href="#">API文档</a></li>
+                        <li><a href="#">合规知识库</a></li>
+                        <li><a href="#">案例研究</a></li>
+                    </ul>
+                </div>
+                
+                <div class="sub-footer-section">
+                    <h4>公司</h4>
+                    <ul>
+                        <li><a href="#">关于我们</a></li>
+                        <li><a href="#">联系我们</a></li>
+                        <li><a href="#">招贤纳士</a></li>
+                        <li><a href="#">新闻动态</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="sub-footer-bottom">
+                <p>© 2025 LawFlow AI. 保留所有权利.</p>
+                <div class="sub-footer-links">
+                    <a href="#">隐私政策</a>
+                    <a href="#">服务条款</a>
+                    <a href="#">Cookie设置</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body></html>
+<script>
+// 合同页背景轮播初始化
+(function initContractCarousel(){
+    const slides = Array.from(document.querySelectorAll('#contractBg .contract-bg-slide'));
+    if(!slides.length) return; let idx=0; slides[0].classList.add('active');
+    setInterval(()=>{slides[idx].classList.remove('active'); idx=(idx+1)%slides.length; slides[idx].classList.add('active');}, 8000);
+})();
+</script>
