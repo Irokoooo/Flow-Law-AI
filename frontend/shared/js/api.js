@@ -3,8 +3,7 @@
 // 调用：FlowLawAPI.login(username, password)
 
 (function(global){
-	const BASE = 'const BASE = 'https://flow-law-ai.onrender.com/api'; 
-
+const BASE = 'https://flow-law-ai.onrender.com/api';
 	async function request(path, { method = 'GET', headers = {}, body = undefined, raw = false } = {}) {
 		const opts = { method, headers, body };
 		const resp = await fetch(`${BASE}${path}`, opts);
@@ -113,4 +112,5 @@
 
 	global.FlowLawAPI = { request, login, uploadFile, chat, scan, auditContract, logout, productInfo, productAudit };
 })(window);
+
 
