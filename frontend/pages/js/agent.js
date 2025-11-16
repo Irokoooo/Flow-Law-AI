@@ -135,12 +135,7 @@ function sendMessage() {
     return;
   }
   
-  fetch('http://localhost:5000/api/chat', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message, session_id: sessionId })
-  })
-    .then(r=>r.json())
+  FlowLawAPI.chat(message, sessionId)
     .then(data=>{
       removeTypingIndicator();
       if(data.success){
@@ -156,7 +151,8 @@ function sendMessage() {
     })
     .catch(err=>{ 
       removeTypingIndicator(); 
-      streamResponse('网络错误或后端未启动: ' + err.message); 
+      console.error('chat request failed', err);
+      streamResponse('网络错误或后端未启动: ' + (err.message || err)); 
     });
 }
 
