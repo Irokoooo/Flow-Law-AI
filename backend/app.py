@@ -3,6 +3,8 @@ from flask_cors import CORS  # 解决跨域问题
 import requests
 import json
 import os
+import re
+import uuid
 from datetime import datetime
 from dotenv import load_dotenv  # 加载环境变量
 """运行方式说明：
@@ -61,6 +63,7 @@ TENCENT_SECRET_ID = os.getenv('TENCENT_SECRET_ID')
 TENCENT_SECRET_KEY = os.getenv('TENCENT_SECRET_KEY')
 TENCENT_AGENT_MODEL = os.getenv('TENCENT_AGENT_MODEL', 'lawflow-default')
 TENCENT_AGENT_APPKEY = os.getenv('TENCENT_AGENT_APPKEY')
+TENCENT_AGENT_SYSTEM_ROLE = os.getenv('TENCENT_AGENT_SYSTEM_ROLE')
 
 # 用户系统（简化版，实际应该用数据库）
 users = {
@@ -70,6 +73,15 @@ users = {
 
 # 模拟的会话存储（实际应该用Redis或数据库）
 sessions = {}
+
+
+def _sanitize_agent_identifier(raw: str | None, prefix: str) -> str:
+    """Ensure identifiers meet Tencent agent regex ^[a-zA-Z0-9_-]{2,64}$."""
+    value = raw or ''
+    cleaned = re.sub(r'[^a-zA-Z0-9_-]', '', value)
+    if len(cleaned) < 2:
+        cleaned = f"{prefix}{int(time.time())}"
+    return cleaned[:64]
 
 # 1. 登录接口
 @app.route('/api/login', methods=['POST'])
@@ -104,8 +116,24 @@ def chat_with_agent():
     session_id = data.get('session_id')
     if not session_id or session_id not in sessions:
         return jsonify({'success': False, 'message': '请先登录'})
+    session_data = sessions[session_id]
+    agent_session_id = session_data.get('agent_session_id')
+    if not agent_session_id:
+        username = session_data.get('username', 'user')
+        login_time = session_data.get('login_time', datetime.now())
+        seed = f"{username}_{int(login_time.timestamp())}"
+        agent_session_id = _sanitize_agent_identifier(seed, 'sess')
+        session_data['agent_session_id'] = agent_session_id
+    visitor_biz_id = session_data.get('visitor_biz_id')
+    if not visitor_biz_id:
+        visitor_biz_id = _sanitize_agent_identifier(session_data.get('username', 'visitor'), 'user')
+        session_data['visitor_biz_id'] = visitor_biz_id
     try:
-        tencent_response = call_tencent_agent(message)
+        tencent_response = call_tencent_agent(
+            message,
+            agent_session_id=agent_session_id,
+            visitor_biz_id=visitor_biz_id
+        )
         return jsonify({'success': True, 'response': tencent_response, 'timestamp': datetime.now().isoformat()})
     except Exception as e:
         return jsonify({'success': False, 'message': f'Agent调用失败: {str(e)}'})
@@ -189,7 +217,90 @@ def _generic_agent_call(message: str, endpoint: str, secret_id: str, secret_key:
         result['note'] = fallback_note
     return result
 
-def call_tencent_agent(message: str):
+def _call_tencent_agent_sse(message: str, agent_session_id: str, visitor_biz_id: str, *,
+                            request_id: str | None = None, system_role: str | None = None):
+    if not TENCENT_AGENT_ENDPOINT:
+        raise RuntimeError('未配置 TENCENT_AGENT_ENDPOINT')
+    if not TENCENT_AGENT_APPKEY:
+        raise RuntimeError('未配置 TENCENT_AGENT_APPKEY')
+    payload = {
+        'request_id': request_id or uuid.uuid4().hex,
+        'content': message,
+        'session_id': agent_session_id,
+        'bot_app_key': TENCENT_AGENT_APPKEY,
+        'visitor_biz_id': visitor_biz_id,
+        'model_name': TENCENT_AGENT_MODEL,
+        'system_role': system_role or TENCENT_AGENT_SYSTEM_ROLE,
+        'stream': 'enable',
+        'incremental': True
+    }
+    payload = {k: v for k, v in payload.items() if v is not None}
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'text/event-stream'
+    }
+    resp = requests.post(
+        TENCENT_AGENT_ENDPOINT,
+        headers=headers,
+        data=json.dumps(payload, ensure_ascii=False).encode('utf-8'),
+        stream=True,
+        timeout=60
+    )
+    if resp.status_code != 200:
+        raise RuntimeError(f"腾讯云 Agent HTTP {resp.status_code}: {resp.text[:200]}")
+    chunks = []
+    last_event = None
+    for raw_line in resp.iter_lines(decode_unicode=True):
+        if not raw_line:
+            continue
+        line = raw_line.strip()
+        if not line or line.startswith(':'):
+            continue
+        if line.startswith('data:'):
+            line = line[5:].strip()
+        if not line:
+            continue
+        try:
+            event = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        last_event = event
+        event_type = event.get('event') or event.get('type')
+        if event_type and event_type.lower() in ('error', 'exception'):
+            raise RuntimeError(event.get('message') or event.get('content') or '腾讯云 agent 返回错误事件')
+        content = (
+            event.get('content')
+            or event.get('answer')
+            or event.get('reply')
+            or (event.get('data') or {}).get('content')
+        )
+        if content:
+            chunks.append(content)
+    if not chunks and last_event:
+        fallback_text = last_event.get('message') or last_event.get('content')
+        if fallback_text:
+            chunks.append(fallback_text)
+    if not chunks:
+        raise RuntimeError('腾讯云 agent 未返回有效内容')
+    full_text = ''.join(chunks).strip()
+    return {
+        'text': full_text or '[未获取到文本内容]',
+        'chunks': chunks,
+        'transport': 'sse'
+    }
+
+
+def call_tencent_agent(message: str, *, agent_session_id: str | None = None,
+                       visitor_biz_id: str | None = None, request_id: str | None = None):
+    if TENCENT_AGENT_ENDPOINT and 'qbot/chat/sse' in TENCENT_AGENT_ENDPOINT:
+        safe_session = _sanitize_agent_identifier(agent_session_id, 'sess')
+        safe_visitor = _sanitize_agent_identifier(visitor_biz_id, 'user')
+        return _call_tencent_agent_sse(
+            message,
+            safe_session,
+            safe_visitor,
+            request_id=request_id
+        )
     return _generic_agent_call(
         message,
         TENCENT_AGENT_ENDPOINT,
