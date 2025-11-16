@@ -105,6 +105,18 @@ chatInput.addEventListener('input', () => {
   }
 });
 
+function getStoredSessionId(){
+  const direct = localStorage.getItem('lf_session_id');
+  if(direct) return direct;
+  try {
+    const legacy = JSON.parse(localStorage.getItem('userSession') || 'null');
+    return legacy && legacy.sessionId ? legacy.sessionId : null;
+  } catch(err) {
+    console.warn('读取历史会话失败', err);
+    return null;
+  }
+}
+
 // 发送消息
 function sendMessage() {
   const message = chatInput.value.trim();
@@ -126,7 +138,7 @@ function sendMessage() {
   }
 
   // 调用后端真实接口 (占位)
-  const sessionId = localStorage.getItem('lf_session_id');
+  const sessionId = getStoredSessionId();
   if(!sessionId){
     setTimeout(()=>{ 
       removeTypingIndicator(); 
@@ -953,7 +965,7 @@ async function fetchProductInfo(){
     return; 
   }
   
-  const sessionId = localStorage.getItem('lf_session_id');
+  const sessionId = getStoredSessionId();
   if(!sessionId){ 
     addMessage('assistant','请先在首页登录以启用产品信息抓取。', false); 
     return; 
