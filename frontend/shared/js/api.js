@@ -27,53 +27,13 @@ const BASE = 'https://flow-law-ai.onrender.com/api';
 		return request('/upload', { method: 'POST', body: fd });
 	}
 
-	// 腾讯云 HTTP SSE 智能问答
-	const FIXED_BOT_APP_KEY = 'PaoePzIPDpqZRDFfWrAuKIvOXYNehWVPurzAzSnQOcZLHHBcNcXUNEHLPtvtArKfxENnEUkCaojJRWMAjqsuttiHbFiGqhKPvGNjPdeYKsUqTVkOUlmxIMsmVdIPJbum'; // 请替换为你的真实AppKey
-
-	async function chat({
-		content,
-		session_id,
-		visitor_biz_id,
-		request_id,
-		file_infos,
-		streaming_throttle,
-		custom_variables,
-		system_role,
-		incremental,
-		search_network,
-		model_name,
-		stream,
-		workflow_status,
-		visitor_labels
-	} = {}) {
-		// 默认参数校验
-		if (!content && (!file_infos || file_infos.length === 0)) throw new Error('content 或 file_infos 必须提供');
-		if (!session_id) throw new Error('session_id 必填');
-		if (!visitor_biz_id) throw new Error('visitor_biz_id 必填');
-		const body = {
-			content,
-			session_id,
-			bot_app_key: FIXED_BOT_APP_KEY,
-			visitor_biz_id,
-			request_id,
-			file_infos,
-			streaming_throttle,
-			custom_variables,
-			system_role,
-			incremental,
-			search_network,
-			model_name,
-			stream,
-			workflow_status,
-			visitor_labels
-		};
-		Object.keys(body).forEach(k => body[k] === undefined && delete body[k]);
-		const resp = await fetch('https://wss.lke.cloud.tencent.com/v1/qbot/chat/sse', {
+	// 修复：chat 方法改为后端 API 调用，安全无跨域
+	async function chat(message, sessionId){
+		return request('/chat', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(body)
+			body: JSON.stringify({ message, session_id: sessionId })
 		});
-		return resp;
 	}
 
 	async function scan(filename, sessionId){
@@ -112,5 +72,4 @@ const BASE = 'https://flow-law-ai.onrender.com/api';
 
 	global.FlowLawAPI = { request, login, uploadFile, chat, scan, auditContract, logout, productInfo, productAudit };
 })(window);
-
 
